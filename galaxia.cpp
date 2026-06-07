@@ -36,8 +36,4 @@ struct Galaxia  {
         this->y = y ; 
         this->z = z ; 
     } ; 
-
-
-
-
 } ; 
