@@ -88,7 +88,7 @@ static vector<string> splitObjects (const string &arrayContent) {
 	return objects;
 }
 
-void getGrafo (Grafo&g ) {
+void getKurskal (Grafo&g ) {
 	string response = fetchUrl(ENDPOINT);
 
 	g = Grafo();
@@ -152,4 +152,10 @@ void getGrafo (Grafo&g ) {
 		}
 	}
 }
+
+
+void getGalaxiaData(Galaxia& g) {} ; 
+
+
+void get
 
