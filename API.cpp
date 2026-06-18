@@ -7,6 +7,7 @@
 using namespace std ; 
 
 #define ENDPOINT "https://galaxias-mock-api.onrender.com/grafo/kruskal"//ENDPOINT DE DONDE SE SACA EL GRAFO
+#define GALAXIA_ENDPOINT "https://galaxias-mock-api.onrender.com/galaxia/"
 
 static size_t writeCallback (void *contents, size_t size, size_t nmemb, void *userp) {
 	string *response = static_cast<string*>(userp);
@@ -88,7 +89,8 @@ static vector<string> splitObjects (const string &arrayContent) {
 	return objects;
 }
 
-void getKurskal (Grafo&g ) {
+
+void GetGrafoURL (Grafo&g , string URL) { // usable solo con /kuyrskal / grafo 
 	string response = fetchUrl(ENDPOINT);
 
 	g = Grafo();
@@ -154,8 +156,35 @@ void getKurskal (Grafo&g ) {
 }
 
 
-void getGalaxiaData(Galaxia& g) {} ; 
 
 
-void get
+void getGalaxiaData(Galaxia& g) {
+	string url = string(GALAXIA_ENDPOINT) + g.id;
+	string response = fetchUrl(url);
+
+	if (response.empty()) return;
+
+	smatch match;
+
+	if (regex_search(response, match, regex("\"codigo\"\\s*:\\s*\"([^\"]+)\"")))
+		g.codigo = match[1].str();
+
+	if (regex_search(response, match, regex("\"nombre\"\\s*:\\s*\"([^\"]+)\"")))
+		g.nombre = match[1].str();
+
+	if (regex_search(response, match, regex("\"tipo\"\\s*:\\s*\"([^\"]+)\"")))
+		g.tipo = match[1].str();
+
+	if (regex_search(response, match, regex("\"x\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
+		g.x = stof(match[1].str());
+
+	if (regex_search(response, match, regex("\"y\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
+		g.y = stof(match[1].str());
+
+	if (regex_search(response, match, regex("\"z\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
+		g.z = stof(match[1].str());
+
+	if (regex_search(response, match, regex("\"descripcion\"\\s*:\\s*\"([^\"]+)\"")))
+		g.descripcion = match[1].str();
+}
 
