@@ -13,5 +13,11 @@ struct Grafo {
     string version;
     vector<Galaxia> galaxias;
     vector<Ruta> rutas;
+
+    Grafo () { 
+        this->totalAristas = this->totalNodos = 0 ; 
+        this->esDirigido = false ; 
+        this->version = "" ; 
+    }
 } ;
 
