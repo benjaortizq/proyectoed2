@@ -8,6 +8,7 @@ using namespace std ;
 
 #define ENDPOINT "https://galaxias-mock-api.onrender.com/grafo/kruskal"//ENDPOINT DE DONDE SE SACA EL GRAFO
 #define GALAXIA_ENDPOINT "https://galaxias-mock-api.onrender.com/galaxia/"
+#define RUTA_ENDPOINT "https://galaxias-mock-api.onrender.com/rutas/"
 
 static size_t writeCallback (void *contents, size_t size, size_t nmemb, void *userp) {
 	string *response = static_cast<string*>(userp);
@@ -90,71 +91,6 @@ static vector<string> splitObjects (const string &arrayContent) {
 }
 
 
-void GetGrafoURL (Grafo&g , string URL) { // usable solo con /kuyrskal / grafo 
-	string response = fetchUrl(ENDPOINT);
-
-	g = Grafo();
-
-	if (response.empty()) {
-		return;
-	}
-
-	smatch match;
-	if (regex_search(response, match, regex(R"("total_nodos"\s*:\s*(\d+))"))) {
-		g.totalNodos = stoi(match[1].str());
-	}
-
-	if (regex_search(response, match, regex(R"("total_aristas"\s*:\s*(\d+))"))) {
-		g.totalAristas = stoi(match[1].str());
-	}
-
-	string aristasArray = getArrayBlock(response, "aristas");
-	vector<string> objects = splitObjects(aristasArray);
-
-	for (const string &object : objects) {
-		smatch routeMatch;
-		regex routeRegex("\\{\\\"id\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"\\s*,\\s*\\\"origen_id\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"\\s*,\\s*\\\"destino_id\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"\\s*,\\s*\\\"tipo\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"\\s*,\\s*\\\"costo\\\"\\s*:\\s*([0-9]+(?:\\.[0-9]+)?)\\s*,\\s*\\\"tiempo_dias\\\"\\s*:\\s*([0-9]+(?:\\.[0-9]+)?)\\s*,\\s*\\\"activa\\\"\\s*:\\s*(true|false)\\s*\\}");
-
-		if (regex_search(object, routeMatch, routeRegex)) {
-			Ruta ruta(
-				routeMatch[1].str(),
-				routeMatch[2].str(),
-				routeMatch[3].str(),
-				routeMatch[4].str(),
-				stof(routeMatch[5].str()),
-				stof(routeMatch[6].str()),
-				routeMatch[7].str() == "true"
-			);
-
-			g.rutas.push_back(ruta);
-
-			bool origenExiste = false;
-			bool destinoExiste = false;
-
-			for (const Galaxia &galaxia : g.galaxias) {
-				if (galaxia.id == ruta.origen_id) {
-					origenExiste = true;
-				}
-				if (galaxia.id == ruta.destino_id) {
-					destinoExiste = true;
-				}
-			}
-
-			if (!origenExiste) {
-				Galaxia origen;
-				origen.id = ruta.origen_id;
-				g.galaxias.push_back(origen);
-			}
-
-			if (!destinoExiste) {
-				Galaxia destino;
-				destino.id = ruta.destino_id;
-				g.galaxias.push_back(destino);
-			}
-		}
-	}
-}
-
 
 
 
@@ -186,5 +122,97 @@ void getGalaxiaData(Galaxia& g) {
 
 	if (regex_search(response, match, regex("\"descripcion\"\\s*:\\s*\"([^\"]+)\"")))
 		g.descripcion = match[1].str();
+} ;
+
+void getRutaData(Ruta&R) { 
+	if (R.id.empty()) return;
+
+	string url = string(RUTA_ENDPOINT) + R.id;
+	string response = fetchUrl(url);
+
+	if (response.empty()) return;
+
+	smatch match;
+
+	if (regex_search(response, match, regex("\"id\"\\s*:\\s*\"([^\"]+)\"")))
+		R.id = match[1].str();
+
+	if (regex_search(response, match, regex("\"origen_id\"\\s*:\\s*\"([^\"]+)\"")))
+		R.origen_id = match[1].str();
+
+	if (regex_search(response, match, regex("\"destino_id\"\\s*:\\s*\"([^\"]+)\"")))
+		R.destino_id = match[1].str();
+
+	if (regex_search(response, match, regex("\"tipo\"\\s*:\\s*\"([^\"]+)\"")))
+		R.tipo = match[1].str();
+
+	if (regex_search(response, match, regex("\"costo\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
+		R.costo = stof(match[1].str());
+
+	if (regex_search(response, match, regex("\"tiempo_dias\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
+		R.tiempo_dias = stof(match[1].str());
+
+	if (regex_search(response, match, regex("\"activa\"\\s*:\\s*(true|false)")))
+		R.activa = match[1].str() == "true";
 }
 
+void GetGrafoURL (Grafo&g , string URL) { // usable solo con /kuyrskal / grafo 
+	string response = fetchUrl(URL);
+
+	g = Grafo();
+
+	if (response.empty()) {
+		return;
+	}
+
+	smatch match;
+	if (regex_search(response, match, regex(R"("total_nodos"\s*:\s*(\d+))"))) {
+		g.totalNodos = stoi(match[1].str());
+	}
+
+	if (regex_search(response, match, regex(R"("total_aristas"\s*:\s*(\d+))"))) {
+		g.totalAristas = stoi(match[1].str());
+	}
+
+	string aristasArray = getArrayBlock(response, "aristas");
+	vector<string> objects = splitObjects(aristasArray);
+
+	for (const string &object : objects) {
+		smatch routeIdMatch;
+		if (regex_search(object, routeIdMatch, regex("\"id\"\\s*:\\s*\"([^\"]+)\""))) {
+			Ruta ruta;
+			ruta.id = routeIdMatch[1].str();
+			getRutaData(ruta);
+
+			if (ruta.id.empty()) {
+				continue;
+			}
+
+			g.rutas.push_back(ruta);
+
+			bool origenExiste = false;
+			bool destinoExiste = false;
+
+			for (const Galaxia &galaxia : g.galaxias) {
+				if (galaxia.id == ruta.origen_id) {
+					origenExiste = true;
+				}
+				if (galaxia.id == ruta.destino_id) {
+					destinoExiste = true;
+				}
+			}
+
+			if (!origenExiste) {
+				Galaxia origen;
+				origen.id = ruta.origen_id;
+				g.galaxias.push_back(origen);
+			}
+
+			if (!destinoExiste) {
+				Galaxia destino;
+				destino.id = ruta.destino_id;
+				g.galaxias.push_back(destino);
+			}
+		}
+	}
+};

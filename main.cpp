@@ -1,13 +1,5 @@
 #include "menu.cpp"
-int main () { 
-
-    Grafo Grafo ; 
-
-    getGrafo (Grafo) ; 
-
-    Grafo.print () ;
-    
-    
+int main () {
     return 0 ;
 
 }
