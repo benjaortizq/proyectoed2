@@ -1,6 +1,5 @@
 
 #include <vector> 
-#include <iostream>
 #include "galaxia.cpp"
 #include "ruta.cpp"
 
