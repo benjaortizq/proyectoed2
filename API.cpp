@@ -6,7 +6,7 @@
 
 using namespace std ; 
 
-#define ENDPOINT "https://galaxias-mock-api.onrender.com/grafo/kruskal"
+#define ENDPOINT "https://galaxias-mock-api.onrender.com/grafo/kruskal"//ENDPOINT DE DONDE SE SACA EL GRAFO
 
 static size_t writeCallback (void *contents, size_t size, size_t nmemb, void *userp) {
 	string *response = static_cast<string*>(userp);

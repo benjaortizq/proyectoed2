@@ -31,4 +31,16 @@ struct Ruta  {
         this->activa = activa;
     }
 
+    void print () const {
+        cout << "Ruta{" << endl;
+        cout << "  id: " << this->id << endl;
+        cout << "  origen_id: " << this->origen_id << endl;
+        cout << "  destino_id: " << this->destino_id << endl;
+        cout << "  tipo: " << this->tipo << endl;
+        cout << "  costo: " << this->costo << endl;
+        cout << "  tiempo_dias: " << this->tiempo_dias << endl;
+        cout << "  activa: " << (this->activa ? "true" : "false") << endl;
+        cout << "}" << endl;
+    }
+
 };

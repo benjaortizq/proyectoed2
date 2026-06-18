@@ -1,7 +1,7 @@
 
 // estos son los nodos de la API o algo asi xd 
 
-#include <string>
+#include <iostream>
 using namespace std  ; 
 struct Galaxia  { 
     string id  ; 
@@ -36,4 +36,17 @@ struct Galaxia  {
         this->y = y ; 
         this->z = z ; 
     } ; 
+
+    void print () const {
+        cout << "Galaxia{" << endl;
+        cout << "  id: " << this->id << endl;
+        cout << "  codigo: " << this->codigo << endl;
+        cout << "  nombre: " << this->nombre << endl;
+        cout << "  tipo: " << this->tipo << endl;
+        cout << "  descripcion: " << this->descripcion << endl;
+        cout << "  x: " << this->x << endl;
+        cout << "  y: " << this->y << endl;
+        cout << "  z: " << this->z << endl;
+        cout << "}" << endl;
+    }
 } ; 
