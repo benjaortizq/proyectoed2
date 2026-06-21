@@ -65,7 +65,24 @@ void obtenerGrafoKurskal (Grafo &g) {
 
     tarea.get();   
 
-    cout << "\r" << VERDE << "Grafo obtenido!            " << RESET << endl;
+    cout << "\r" << VERDE << "Grafo inicial obtenido!            " << RESET << endl;
+}
+
+void rellenarDatosGrafo (Grafo &g) {
+    future<void> tarea = async(launch::async, [&g]() {
+        fillGalaxiaData(g);
+    });
+
+    int puntos = 0;
+    while (tarea.wait_for(chrono::milliseconds(400)) != future_status::ready) {
+        puntos = (puntos % 3) + 1;            // cicla 1, 2, 3, 1, 2, 3...
+        string animacion(puntos, '.');        // "." , ".." , "..."
+        cout << "\r" << AMARILLO << "Obteniendo datos de Galaxias" << animacion << "   " << RESET << flush;
+    }
+
+    tarea.get();   
+
+    cout << "\r" << VERDE << "Datos de Galaxias obtenidas!            " << RESET << endl;
 }
 
 
@@ -74,34 +91,103 @@ void menuConsultas() {
     int  o;
 
     do {
+        cout<<endl ;cout<<endl ;cout<<endl ;
         cout  << CIAN << "========= Menu de Consultas ========="<<RESET<<endl ;
+        cout <<"1. Rutas desde una Galaxia "<<endl ; 
+        cout <<"2. Ruta de menor costo entre dos Galaxias "<<endl ; 
+        cout <<"3. Arbol de conexiones  "<<endl ; 
+        cout <<"4. Historial de viajes por nave   "<<endl ; 
+        cout <<"0. Volver "<<endl ;cout<<endl ;
+        cout <<"Escriba una opcion : " ; 
+
         o= leerOpcion() ;
+        if (o < 0 || o > 3) {
+            cout << ROJO << "Solo opciones del 0 al 4.\n" << RESET;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue;
+        }
 
     }
     while (o!=0) ;
 
 }
+
+
+
+
+
+
+
+
 
 void menuReportes() { 
     int o ;
 
     do {
-        cout  << CIAN_CLARO << "========= Menu de Reportes ========="<<RESET<<endl ;
+        cout<<endl ;cout<<endl ;cout<<endl ;
+        cout  << VERDE_CLARO << "========= Menu de Reportes ========="<<RESET<<endl ;
+        cout <<"1. Generar Archivo con las rutas mas cortas generadas "<<endl ; 
+        cout <<"2. Generar Archivo de Arbol de Expansion "<<endl ; 
+        cout <<"3. Generar Informe de estadisticas"<<endl ; 
+        cout <<"0. Volver "<<endl ;cout<<endl ;
+        cout <<"Escriba una opcion : " ; 
         o= leerOpcion() ;
+        if (o < 0 || o > 3) {
+            cout << ROJO << "Solo opciones del 0 al 3.\n" << RESET;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue;
+        }
     }
     while (o!=0) ;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 void menuGrafo() { 
     int o ;
     do {
+        cout<<endl ;cout<<endl ;cout<<endl ;
         cout  << AMARILLO << "========= Menu de Grafo ========="<<RESET<<endl ;
+        cout <<"1. Opciones de Galaxias "<<endl ; 
+        cout <<"2. Opciones de Rutas"<<endl ; 
+        cout <<"3. Opciones de Naves"<<endl ;
+        cout <<"0. Volver "<<endl ;cout<<endl ;
+        cout <<"Escriba una opcion : " ; 
         o= leerOpcion() ;
+
+        if (o < 0 || o > 3) {
+            cout << ROJO << "Solo opciones del 0 al 3.\n" << RESET;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue;
+        }
     }
     while (o!=0) ;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void menu () {
@@ -114,7 +200,7 @@ void menu () {
         cout <<"1. Consultas "<<endl ; 
         cout <<"2. Reportes "<<endl ; 
         cout <<"3. Grafo "<<endl ; 
-        cout <<"0. Salir "<<endl ;
+        cout <<"0. Salir "<<endl ;cout<<endl ;
         cout <<"Escriba una opcion : " ; 
         o= leerOpcion() ;
         if (o < 0 || o > 3) {

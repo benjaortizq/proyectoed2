@@ -8,10 +8,8 @@ using namespace std ;
 
 // Dibuja el grafo en una ventana 2D. Cada galaxia se ubica segun sus
 // coordenadas reales (x, y); las aristas son lineas entre galaxias con su costo.
-// Si las galaxias no tienen coordenadas utiles (todas en 0), las acomoda en
-// circulo para que igual se vean.
-// Las rutas que vengan en "resaltadas" se dibujan en ROJO y mas gruesas (sirve
-// para mostrar un camino de Dijkstra, el arbol de Kruskal, etc.).
+// Si las galaxias no tienen coordenadas utiles (todas en 0), las acomoda en circulo para que igual se vean.
+// Las rutas que vengan en "resaltadas" se dibujan en ROJO y mas gruesas (sirve para mostrar un camino de Dijkstra, el arbol de Kruskal, etc.).
 void dibujarGrafo (const Grafo &g, const vector<Ruta> &resaltadas) {
     const int ANCHO = 1500;
     const int ALTO  = 800;
