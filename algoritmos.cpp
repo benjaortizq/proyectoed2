@@ -91,8 +91,7 @@ Grafo kruskal (const Grafo &g) {
 
 
 // ---------------------------------------------------------------------------
-// Dijkstra: ruta de MENOR COSTO entre dos galaxias.
-// ---------------------------------------------------------------------------
+// Dijkstra
 string otroExtremo (const Ruta &r, const string &nodo) {
     return (r.origen_id == nodo) ? r.destino_id : r.origen_id;
 }

@@ -1,5 +1,6 @@
 
-#include "API.cpp"
+#include "gui.cpp"
+#include "archivos.cpp"
 
 void menu () { 
 
