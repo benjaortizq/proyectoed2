@@ -209,11 +209,12 @@ void fillGalaxiaData(Grafo& g) {
 			galaxiasPorId[galaxia.id] = galaxia;
 	}
 
-	// 2. Completar los datos SOLO de las galaxias que estan en el grafo de entrada.
+
 	for (Galaxia& galaxia : g.galaxias) {
 		map<string, Galaxia>::iterator it = galaxiasPorId.find(galaxia.id);
 		if (it != galaxiasPorId.end()) {
-			galaxia = it->second;   // copia codigo, nombre, tipo, x, y, z, descripcion
+			galaxia = it->second;   
 		}
 	}
+
 }
