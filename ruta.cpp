@@ -31,6 +31,16 @@ struct Ruta  {
         this->activa = activa;
     }
 
+    // Reemplaza todos los datos de la ruta (menos el id, que es su clave).
+    void Editar (string origen_id, string destino_id, string tipo, float costo, float tiempo_dias, bool activa) {
+        this->origen_id = origen_id;
+        this->destino_id = destino_id;
+        this->tipo = tipo;
+        this->costo = costo;
+        this->tiempo_dias = tiempo_dias;
+        this->activa = activa;
+    }
+
     void print () const {
         cout << "Ruta{" << endl;
         cout << "  id: " << this->id << endl;

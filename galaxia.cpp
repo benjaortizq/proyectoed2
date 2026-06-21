@@ -37,6 +37,17 @@ struct Galaxia  {
         this->z = z ; 
     } ; 
 
+    // Reemplaza todos los datos de la galaxia (menos el id, que es su clave).
+    void Editar (string codigo , string nombre , string tipo , string descripcion , float x , float y , float z) {
+        this->codigo = codigo ;
+        this->nombre = nombre ;
+        this->tipo = tipo ;
+        this->descripcion = descripcion ;
+        this->x = x ;
+        this->y = y ;
+        this->z = z ;
+    }
+
     void print () const {
         cout << "Galaxia{" << endl;
         cout << "  id: " << this->id << endl;
@@ -49,4 +60,4 @@ struct Galaxia  {
         cout << "  z: " << this->z << endl;
         cout << "}" << endl;
     }
-} ; 
+} ;
