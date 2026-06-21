@@ -1,6 +1,6 @@
-
-#include <vector> 
-#include "galaxia.cpp"
+#pragma once
+#include <vector>
+#include "nave.cpp"
 #include "ruta.cpp"
 
 using namespace std ;

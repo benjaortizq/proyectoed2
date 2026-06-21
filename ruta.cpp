@@ -1,6 +1,7 @@
 // esto es litealmente las Aristas de lo que la API me da xd  
+#pragma once
 #include <string>
-using namespace std  ; 
+using namespace std  ;
 
 struct Ruta  { 
     string id  ; 
