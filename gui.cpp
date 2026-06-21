@@ -1,6 +1,7 @@
 #include "algoritmos.cpp"   // trae Grafo, GetGrafoURL, fillGalaxiaData, kruskal, dijkstra
 #include "raylib.h"
 #include <cmath>
+#include <set>
 
 using namespace std ;
 
@@ -9,10 +10,18 @@ using namespace std ;
 // coordenadas reales (x, y); las aristas son lineas entre galaxias con su costo.
 // Si las galaxias no tienen coordenadas utiles (todas en 0), las acomoda en
 // circulo para que igual se vean.
-void dibujarGrafo (const Grafo &g) {
-    const int ANCHO = 1100;
+// Las rutas que vengan en "resaltadas" se dibujan en ROJO y mas gruesas (sirve
+// para mostrar un camino de Dijkstra, el arbol de Kruskal, etc.).
+void dibujarGrafo (const Grafo &g, const vector<Ruta> &resaltadas) {
+    const int ANCHO = 1500;
     const int ALTO  = 800;
-    const int MARGEN = 70;   // espacio para que los nodos no toquen el borde
+    const int MARGEN = 150;   // espacio para que los nodos no toquen el borde
+
+    // Conjunto con los id de las rutas a resaltar, para buscarlas en O(log n).
+    set<string> idsResaltadas;
+    for (const Ruta &r : resaltadas) {
+        idsResaltadas.insert(r.id);
+    }
 
     // 1. Calcular el rango real de coordenadas (bounding box) de las galaxias.
     float minX = 1e9f, maxX = -1e9f, minY = 1e9f, maxY = -1e9f;
@@ -41,10 +50,8 @@ void dibujarGrafo (const Grafo &g) {
             pos[g.galaxias[i].id] = { cx + radio * cosf(ang), cy + radio * sinf(ang) };
         }
     }
-
-    // 3. Abrir la ventana y dibujar en bucle hasta que cierren (ESC o la X).
     InitWindow(ANCHO, ALTO, "Red Galactica - Proyecto ED");
-    SetTargetFPS(60);
+    SetTargetFPS(30);
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -55,12 +62,18 @@ void dibujarGrafo (const Grafo &g) {
             if (!pos.count(r.origen_id) || !pos.count(r.destino_id)) continue;
             Vector2 a = pos[r.origen_id];
             Vector2 b = pos[r.destino_id];
-            DrawLineEx(a, b, 1.5f, Color{ 90, 90, 120, 255 });
+
+            // Si la ruta esta en el conjunto a resaltar -> roja y mas gruesa.
+            bool resaltada = idsResaltadas.count(r.id) > 0;
+            Color  colorLinea = resaltada ? RED : Color{ 90, 90, 120, 255 };
+            float  grosor     = resaltada ? 3.5f : 1.5f;
+            DrawLineEx(a, b, grosor, colorLinea);
 
             // costo en el punto medio de la arista
             int mx = (int)((a.x + b.x) / 2.0f);
             int my = (int)((a.y + b.y) / 2.0f);
-            DrawText(TextFormat("%.0f", r.costo), mx, my, 11, Color{ 150, 150, 170, 255 });
+            Color colorTexto = resaltada ? RED : Color{ 150, 150, 170, 255 };
+            DrawText(TextFormat("%.0f", r.costo), mx, my, 11, colorTexto);
         }
 
         // b. Nodos encima (circulo + nombre).
