@@ -2,13 +2,15 @@
 #include <regex>
 #include <string>
 #include <vector>
+#include <map>
 #include "grafo.cpp"
 
-using namespace std ; 
+using namespace std ;
 
 #define ENDPOINT "https://galaxias-mock-api.onrender.com/grafo/kruskal"//ENDPOINT DE DONDE SE SACA EL GRAFO
 #define GALAXIA_ENDPOINT "https://galaxias-mock-api.onrender.com/galaxia/"
 #define RUTA_ENDPOINT "https://galaxias-mock-api.onrender.com/rutas/"
+#define GRAFO_ENDPOINT "https://galaxias-mock-api.onrender.com/grafo/"//grafo completo con todos los datos de los nodos
 
 static size_t writeCallback (void *contents, size_t size, size_t nmemb, void *userp) {
 	string *response = static_cast<string*>(userp);
@@ -159,64 +161,59 @@ void GetGrafoURL (Grafo&g , string URL) { // usable solo con /kuyrskal / grafo
 
 
 
-void getGalaxiaData(Galaxia& g) {
-	string url = string(GALAXIA_ENDPOINT) + g.id;
-	string response = fetchUrl(url);
+// Pide el grafo COMPLETO (/grafo/) que trae todos los datos de cada nodo, arma
+// un diccionario id -> Galaxia con todas las galaxias, y luego rellena los datos
+// (codigo, nombre, tipo, x, y, z, descripcion) SOLO de las galaxias que ya
+// existen en el grafo "g" que se recibe (p.ej. el que devolvio /grafo/kruskal,
+// que solo trae el id de cada nodo).
+void fillGalaxiaData(Grafo& g) {
+	string response = fetchUrl(GRAFO_ENDPOINT);
 
 	if (response.empty()) return;
 
-	smatch match;
+	// 1. Parsear TODOS los nodos del grafo completo en un diccionario id -> Galaxia.
+	map<string, Galaxia> galaxiasPorId;
 
-	if (regex_search(response, match, regex("\"codigo\"\\s*:\\s*\"([^\"]+)\"")))
-		g.codigo = match[1].str();
+	string nodosArray = getArrayBlock(response, "nodos");
+	vector<string> objects = splitObjects(nodosArray);
 
-	if (regex_search(response, match, regex("\"nombre\"\\s*:\\s*\"([^\"]+)\"")))
-		g.nombre = match[1].str();
+	for (const string& object : objects) {
+		Galaxia galaxia;
+		smatch match;
 
-	if (regex_search(response, match, regex("\"tipo\"\\s*:\\s*\"([^\"]+)\"")))
-		g.tipo = match[1].str();
+		if (regex_search(object, match, regex("\"id\"\\s*:\\s*\"([^\"]+)\"")))
+			galaxia.id = match[1].str();
 
-	if (regex_search(response, match, regex("\"x\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
-		g.x = stof(match[1].str());
+		if (regex_search(object, match, regex("\"codigo\"\\s*:\\s*\"([^\"]+)\"")))
+			galaxia.codigo = match[1].str();
 
-	if (regex_search(response, match, regex("\"y\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
-		g.y = stof(match[1].str());
+		if (regex_search(object, match, regex("\"nombre\"\\s*:\\s*\"([^\"]+)\"")))
+			galaxia.nombre = match[1].str();
 
-	if (regex_search(response, match, regex("\"z\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
-		g.z = stof(match[1].str());
+		if (regex_search(object, match, regex("\"tipo\"\\s*:\\s*\"([^\"]+)\"")))
+			galaxia.tipo = match[1].str();
 
-	if (regex_search(response, match, regex("\"descripcion\"\\s*:\\s*\"([^\"]+)\"")))
-		g.descripcion = match[1].str();
-}
+		if (regex_search(object, match, regex("\"x\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
+			galaxia.x = stof(match[1].str());
 
-void getRutaData(Ruta&R) { 
-	if (R.id.empty()) return;
+		if (regex_search(object, match, regex("\"y\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
+			galaxia.y = stof(match[1].str());
 
-	string url = string(RUTA_ENDPOINT) + R.id;
-	string response = fetchUrl(url);
+		if (regex_search(object, match, regex("\"z\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
+			galaxia.z = stof(match[1].str());
 
-	if (response.empty()) return;
+		if (regex_search(object, match, regex("\"descripcion\"\\s*:\\s*\"([^\"]+)\"")))
+			galaxia.descripcion = match[1].str();
 
-	smatch match;
+		if (!galaxia.id.empty())
+			galaxiasPorId[galaxia.id] = galaxia;
+	}
 
-	if (regex_search(response, match, regex("\"id\"\\s*:\\s*\"([^\"]+)\"")))
-		R.id = match[1].str();
-
-	if (regex_search(response, match, regex("\"origen_id\"\\s*:\\s*\"([^\"]+)\"")))
-		R.origen_id = match[1].str();
-
-	if (regex_search(response, match, regex("\"destino_id\"\\s*:\\s*\"([^\"]+)\"")))
-		R.destino_id = match[1].str();
-
-	if (regex_search(response, match, regex("\"tipo\"\\s*:\\s*\"([^\"]+)\"")))
-		R.tipo = match[1].str();
-
-	if (regex_search(response, match, regex("\"costo\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
-		R.costo = stof(match[1].str());
-
-	if (regex_search(response, match, regex("\"tiempo_dias\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
-		R.tiempo_dias = stof(match[1].str());
-
-	if (regex_search(response, match, regex("\"activa\"\\s*:\\s*(true|false)")))
-		R.activa = match[1].str() == "true";
+	// 2. Completar los datos SOLO de las galaxias que estan en el grafo de entrada.
+	for (Galaxia& galaxia : g.galaxias) {
+		map<string, Galaxia>::iterator it = galaxiasPorId.find(galaxia.id);
+		if (it != galaxiasPorId.end()) {
+			galaxia = it->second;   // copia codigo, nombre, tipo, x, y, z, descripcion
+		}
+	}
 }

@@ -56,15 +56,6 @@ struct UnionFind {
     }
 };
 
-
-// ---------------------------------------------------------------------------
-// Kruskal modificado (aleatorio)
-// El endpoint /grafo/kruskal ya entrega las aristas en orden aleatorio, por lo
-// que NO se ordenan por costo: se recorren tal cual vienen. Por cada arista, si
-// une dos conjuntos diferentes, se agrega al MST y se unen esos conjuntos.
-// Devuelve un Grafo nuevo que contiene los mismos nodos y solo las aristas del
-// arbol de expansion resultante.
-// ---------------------------------------------------------------------------
 Grafo kruskal (const Grafo &g) {
     Grafo mst;
     mst.galaxias   = g.galaxias;      // el MST tiene los mismos nodos
