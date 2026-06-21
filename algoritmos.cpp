@@ -93,17 +93,11 @@ Grafo kruskal (const Grafo &g) {
 // ---------------------------------------------------------------------------
 // Dijkstra: ruta de MENOR COSTO entre dos galaxias.
 // ---------------------------------------------------------------------------
-
-// Dada una ruta y uno de sus extremos, devuelve el OTRO extremo. Sirve porque
-// el grafo es no dirigido: una ruta se puede recorrer en ambos sentidos.
 string otroExtremo (const Ruta &r, const string &nodo) {
     return (r.origen_id == nodo) ? r.destino_id : r.origen_id;
 }
 
-// Calcula el camino de menor costo desde "origen" hasta "destino" usando el
-// costo (r.costo) como peso de cada arista. Devuelve la secuencia de rutas que
-// forman ese camino, ordenadas de origen -> destino. Vector vacio si no existe
-// camino (o si origen == destino). El costo total = suma de r.costo del vector.
+
 vector<Ruta> dijkstra (const Grafo &g, const string &origen, const string &destino) {
     // 1. Lista de adyacencia: por cada nodo, las rutas que lo tocan.
     //    Como es no dirigido, cada ruta se agrega a sus DOS extremos.
