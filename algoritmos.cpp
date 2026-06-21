@@ -1,5 +1,8 @@
 #include "API.cpp"
 #include <map>
+#include <queue>
+#include <limits>
+#include <algorithm>
 
 using namespace std  ;
 
@@ -85,3 +88,89 @@ Grafo kruskal (const Grafo &g) {
     mst.totalAristas = (int)mst.rutas.size();
     return mst;
 }
+
+
+// ---------------------------------------------------------------------------
+// Dijkstra: ruta de MENOR COSTO entre dos galaxias.
+// ---------------------------------------------------------------------------
+
+// Dada una ruta y uno de sus extremos, devuelve el OTRO extremo. Sirve porque
+// el grafo es no dirigido: una ruta se puede recorrer en ambos sentidos.
+string otroExtremo (const Ruta &r, const string &nodo) {
+    return (r.origen_id == nodo) ? r.destino_id : r.origen_id;
+}
+
+// Calcula el camino de menor costo desde "origen" hasta "destino" usando el
+// costo (r.costo) como peso de cada arista. Devuelve la secuencia de rutas que
+// forman ese camino, ordenadas de origen -> destino. Vector vacio si no existe
+// camino (o si origen == destino). El costo total = suma de r.costo del vector.
+vector<Ruta> dijkstra (const Grafo &g, const string &origen, const string &destino) {
+    // 1. Lista de adyacencia: por cada nodo, las rutas que lo tocan.
+    //    Como es no dirigido, cada ruta se agrega a sus DOS extremos.
+    map<string, vector<Ruta>> adyacencia;
+    for (const Ruta &r : g.rutas) {
+        adyacencia[r.origen_id].push_back(r);
+        adyacencia[r.destino_id].push_back(r);
+    }
+
+    // 2. Estructuras de Dijkstra.
+    map<string, float> dist;         // mejor costo conocido para llegar a cada nodo
+    map<string, Ruta>  rutaLlegada;  // arista con la que se llego a cada nodo
+    map<string, bool>  visitado;
+
+    for (const Galaxia &gal : g.galaxias) {
+        dist[gal.id] = numeric_limits<float>::infinity();
+    }
+    dist[origen] = 0.0f;
+
+    // Min-heap de pares (costoAcumulado, nodo): siempre saca el de menor costo.
+    priority_queue<
+        pair<float, string>,
+        vector<pair<float, string>>,
+        greater<pair<float, string>>
+    > cola;
+    cola.push({0.0f, origen});
+
+    // 3. Bucle principal.
+    while (!cola.empty()) {
+        string actual = cola.top().second;
+        cola.pop();
+
+        if (visitado[actual]) continue;  // ya se proceso con su costo definitivo
+        visitado[actual] = true;
+
+        if (actual == destino) break;    // ya tenemos el costo optimo al destino
+
+        // Relajar cada vecino: si llegar por aqui es mas barato, actualizar.
+        for (const Ruta &r : adyacencia[actual]) {
+            string vecino = otroExtremo(r, actual);
+            float nuevoCosto = dist[actual] + r.costo;
+
+            if (nuevoCosto < dist[vecino]) {
+                dist[vecino] = nuevoCosto;
+                rutaLlegada[vecino] = r;
+                cola.push({nuevoCosto, vecino});
+            }
+        }
+    }
+
+    // 4. Reconstruir el camino caminando hacia atras desde el destino.
+    vector<Ruta> camino;
+    if (dist[destino] == numeric_limits<float>::infinity()) {
+        return camino;   // destino inalcanzable -> vector vacio
+    }
+
+    string nodo = destino;
+    while (nodo != origen) {
+        if (rutaLlegada.find(nodo) == rutaLlegada.end()) {
+            return vector<Ruta>();   // seguridad: camino incompleto
+        }
+        Ruta r = rutaLlegada[nodo];
+        camino.push_back(r);
+        nodo = otroExtremo(r, nodo);   // retroceder al nodo anterior
+    }
+
+    reverse(camino.begin(), camino.end());   // dejarlo en orden origen -> destino
+    return camino;
+}
+
