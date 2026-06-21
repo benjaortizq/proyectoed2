@@ -1,18 +1,17 @@
 #include "menu.cpp"
 int main () {
+    cout<<endl ;
+    cout<<endl ;
+    cout<<endl ;
+    cout <<CIAN<<"-------------------II PROYECTO ESTRUCTURAS DE DATOS -------------------"<<RESET<<endl ; 
+    this_thread::sleep_for(chrono::milliseconds(500));
+    cout << "~~~~~~~~~~~~~~ Benjamin Ortiz Quispe - 2025064599 ~~~~~~~~~~~~"<<endl ;
+    this_thread::sleep_for(chrono::milliseconds(500));
 
-    Grafo G ; 
+    Grafo Principal ; 
 
-    GetGrafoURL (G, ENDPOINT) ;
-    G.print () ;
-    fillGalaxiaData(G) ;
+    obtenerGrafoKurskal (Principal) ;
 
-    // Rutas a resaltar en rojo. Vacio = no se resalta nada.
-    // Ej: para resaltar el arbol de Kruskal -> kruskal(G).rutas
-    //     para resaltar un camino de Dijkstra -> dijkstra(G, "galaxia-1", "galaxia-9")
-    vector<Ruta> resaltadas ;
-
-    dibujarGrafo (G, resaltadas) ;
-    return 0 ;
+    menu() ; 
 
 }

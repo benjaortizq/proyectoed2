@@ -5,4 +5,4 @@ RAYLIB = $(shell pkg-config --cflags --libs raylib)
 all: compile_all
 
 compile_all:
-	g++ -std=c++17 -o proyecto main.cpp -lcurl $(RAYLIB)
+	g++ -std=c++17 -pthread -o proyecto main.cpp -lcurl $(RAYLIB)

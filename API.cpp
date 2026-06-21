@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include "grafo.cpp"
+#include "nave.cpp"
 
 using namespace std ;
 
