@@ -37,8 +37,11 @@
 using namespace std ;
 //!GENERACION DE ESTRUCTURAS AUXILIARES PARA ALMACENAMIETO DE RUTAS Y NAVES.
 
-    vector<Nave>  naves ;     // todas las naves y su estado
-    vector<Viaje> viajes ;    // todos los viajes (historial completo)
+vector<Nave>  naves ;     // todas las naves y su estado
+vector<Viaje> viajes ;    // todos los viajes (historial completo)
+
+Grafo k ; 
+Grafo Principal ; 
 
 int leerOpcion () {
     int opcion;
@@ -132,7 +135,14 @@ void rellenarDatosGrafo (Grafo &g) {
 //!MENUS-------------------------------------------------
 
 
+void MenuConsultasRutasdesdeGalaxia () { 
 
+}
+
+void arbolConexiones(Grafo&g ) {    
+    k = kruskal(g) ; 
+    GraficarARBOL (k) ;
+} ;
 void menuConsultas() { 
     int  o;
 
@@ -153,10 +163,32 @@ void menuConsultas() {
             continue;
         }
 
+        switch (o) {
+
+            case 0 : {
+                break ;
+            }
+
+
+            case 1 : { 
+                MenuConsultasRutasdesdeGalaxia() ;
+                continue;
+
+            }
+
+            case 2 : {
+
+                }
+            
+            case 3: 
+            {arbolConexiones (Principal) ;}
+        }
     }
     while (o!=0) ;
 
-}
+};
+
+
 
 
 

@@ -15,7 +15,7 @@ int main () {
 
     //algorimos inicialews
 
-    Grafo Principal ; 
+    
     obtenerGrafoKurskal (Principal) ;
     rellenarDatosGrafo (Principal);
     obtenerNaves () ;

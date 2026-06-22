@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <iomanip>
 #include "nave.cpp"
 #include "ruta.cpp"
 
@@ -47,6 +48,72 @@ struct Grafo {
         }
         cout << "  ]" << endl;
         cout << "}" << endl;
+    }
+
+
+    // ===================== IMPRESION EN TABLA =====================
+
+    // Imprime todas las galaxias en formato tabla (parametros simplificados).
+    void printGalaxias () {
+        cout << left;
+        cout << setw(13) << "ID" << setw(13) << "CODIGO"
+             << setw(26) << "NOMBRE" << setw(14) << "TIPO" << endl;
+        cout << string(66, '-') << endl;
+
+        for (const Galaxia &g : this->galaxias) {
+            cout << setw(13) << g.id << setw(13) << g.codigo
+                 << setw(26) << g.nombre << setw(14) << g.tipo << endl;
+        }
+        cout << "Total: " << this->galaxias.size() << " galaxias" << endl;
+    }
+
+    // Imprime todas las rutas en formato tabla (parametros simplificados).
+    void printRutas () {
+        cout << left;
+        cout << setw(11) << "ID" << setw(13) << "ORIGEN" << setw(13) << "DESTINO"
+             << setw(14) << "TIPO" << setw(10) << "COSTO"
+             << setw(9) << "TIEMPO" << setw(7) << "ACTIVA" << endl;
+        cout << string(76, '-') << endl;
+
+        for (const Ruta &r : this->rutas) {
+            cout << setw(11) << r.id << setw(13) << r.origen_id << setw(13) << r.destino_id
+                 << setw(14) << r.tipo << setw(10) << r.costo
+                 << setw(9) << r.tiempo_dias << setw(7) << (r.activa ? "si" : "no") << endl;
+        }
+        cout << "Total: " << this->rutas.size() << " rutas" << endl;
+    }
+
+    // Imprime en formato tabla las rutas que salen de una galaxia dada.
+    // (No dirigido: se muestra el OTRO extremo de cada ruta como destino.)
+    void imprimirAdyacencia (Galaxia gal) {
+        cout << "Rutas desde " << gal.id;
+        if (!gal.nombre.empty()) cout << " (" << gal.nombre << ")";
+        cout << ":" << endl;
+
+        cout << left;
+        cout << setw(11) << "RUTA" << setw(13) << "DESTINO" << setw(14) << "TIPO"
+             << setw(10) << "COSTO" << setw(9) << "TIEMPO" << endl;
+        cout << string(57, '-') << endl;
+
+        bool alguna = false;
+        for (const Ruta &r : this->rutas) {
+            if (r.origen_id == gal.id || r.destino_id == gal.id) {
+                string destino = (r.origen_id == gal.id) ? r.destino_id : r.origen_id;
+                cout << setw(11) << r.id << setw(13) << destino << setw(14) << r.tipo
+                     << setw(10) << r.costo << setw(9) << r.tiempo_dias << endl;
+                alguna = true;
+            }
+        }
+        if (!alguna) cout << "(sin rutas)" << endl;
+    }
+
+    // Devuelve la galaxia con ese id (copia). Si no existe, devuelve una vacia.
+    Galaxia getGalaxia (string id) {
+        Galaxia* g = buscarGalaxia(id);
+        if (g != nullptr) {
+            return *g;
+        }
+        return Galaxia();
     }
 
 
