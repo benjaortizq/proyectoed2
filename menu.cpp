@@ -97,18 +97,46 @@ void obtenerViajes () {
 
 
 void obtenerGrafoKurskal (Grafo &g) {
-    future<void> tarea = async(launch::async, [&g]() {
-        GetGrafoURL(g, ENDPOINT);
-    });
-
     int puntos = 0;
-    while (tarea.wait_for(chrono::milliseconds(400)) != future_status::ready) {
+    auto inicio = chrono::steady_clock::now() ;
+    const auto TIMEOUT = chrono::seconds (60) ;
+
+    // Reintentar hasta lograr datos o hasta agotar el timeout global.
+    while (true) {
+        // Un intento de descarga en segundo plano.
+        future<void> tarea = async(launch::async, [&g]() {
+            GetGrafoURL(g, ENDPOINT);
+        });
+
+        // Esperar a que ESTE intento termine, animando los puntos.
+        while (tarea.wait_for(chrono::milliseconds(400)) != future_status::ready) {
+            puntos = (puntos % 3) + 1;            // cicla 1, 2, 3, 1, 2, 3...
+            string animacion(puntos, '.');        // "." , ".." , "..."
+            cout << "\r" << AMARILLO << "Conectando con EndPoint " << animacion << "   " << RESET << flush;
+
+            if (chrono::steady_clock::now() - inicio >= TIMEOUT) {
+                cout << "\r" << ROJO << "Error: Tiempo de espera agotado (60s). Verifique la conexion." << RESET << endl;
+                exit(1);
+            }
+        }
+        tarea.get();
+
+        // Exito: GetGrafoURL trajo aristas -> salimos.
+        if (!g.rutas.empty()) {
+            break;
+        }
+
+        // Fallo (sin internet o servidor caido): GetGrafoURL volvio vacio.
+        // Reintentar si todavia queda tiempo.
+        if (chrono::steady_clock::now() - inicio >= TIMEOUT) {
+            cout << "\r" << ROJO << "Error: Tiempo de espera agotado (60s). Verifique la conexion." << RESET << endl;
+            exit(1);
+        }
         puntos = (puntos % 3) + 1;            // cicla 1, 2, 3, 1, 2, 3...
         string animacion(puntos, '.');        // "." , ".." , "..."
-        cout << "\r" << AMARILLO << "Conectando con EndPoint " << animacion << "   " << RESET << flush;
+        cout << "\r" << ROJO_CLARO << "Sin respuesta del servidor, reintentando" <<animacion<<"          "<< RESET << flush;
+        this_thread::sleep_for(chrono::seconds(2));   // pausa antes del siguiente intento
     }
-
-    tarea.get();   
 
     cout << "\r" << VERDE << "Grafo inicial obtenido!            " << RESET << endl;
 }
@@ -143,9 +171,12 @@ void rutamascortaentreGalaxias() {
         cout<<endl ;
         Principal.printGalaxias() ;
         cout<<endl ;cout<<endl ;
-        cout<<"Escriba el numero de la galaxia origen : " ;
+        cout<<"Escriba el numero de la galaxia origen (0 para volver) : " ;
 
         g1=leerOpcion () ;
+        if(g1==0) { 
+            break;
+        }
         string id1 = "galaxia-" + to_string(g1) ;
         Galaxia t1 = Principal.getGalaxia (id1) ;
         cout<<endl ;
@@ -158,9 +189,12 @@ void rutamascortaentreGalaxias() {
 
         this_thread::sleep_for(chrono::milliseconds(100));
 
-        cout<<"Escriba el numero de la galaxia destino : " ;
+        cout<<"Escriba el numero de la galaxia destino (0 para volver ) : " ;
 
         g2=leerOpcion () ;
+        if (g2 == 0) { 
+            break;
+        }
         string id2 = "galaxia-" + to_string(g2) ;
         Galaxia t2 = Principal.getGalaxia (id2) ;
         cout<<endl ;
@@ -196,8 +230,11 @@ void MenuConsultasRutasdesdeGalaxia () {
         cout<<endl ;
         Principal.printGalaxias() ;
         cout<<endl ;cout<<endl ;
-        cout<<"Escriba el numero de galaxia a consultar : " ;
+        cout<<"Escriba el numero de galaxia a consultar (o 0 para volver): " ;
         o=leerOpcion () ;
+        if (o==0) { 
+            break ;
+        }
         cout<<endl ;
         string id = "galaxia-" + to_string(o) ;
         Galaxia t = Principal.getGalaxia (id) ;
@@ -218,6 +255,12 @@ void arbolConexiones(Grafo&g ) {
     k = kruskal(g) ; 
     GraficarARBOL (k) ;
 } ;
+
+
+void historialdeViajes() { 
+
+} ; 
+
 void menuConsultas() { 
     int  o;
 
@@ -259,6 +302,12 @@ void menuConsultas() {
             case 3: {
                 arbolConexiones (Principal) ;
                 continue ;
+            }
+
+            case 4 : { 
+                historialdeViajes() ; 
+                continue;
+
             }
         }
     }
