@@ -22,6 +22,7 @@ int main () {
     obtenerViajes () ;
     asignarHistorialANaves(naves, viajes) ;   // copia a cada nave sus viajes
     Principal.crearListaAdyacencia() ;
+    archivosRUTASMINIMAS= contarArchivosConPrefijo(NOMBRE_ARCHIVO_RUTAS) ;
 
     
 

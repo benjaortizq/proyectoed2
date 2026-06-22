@@ -207,6 +207,7 @@ void rutamascortaentreGalaxias() {
 
         // Calcular el camino de menor costo y mostrarlo.
         vector<Ruta> camino = dijkstra (Principal , id1 , id2) ;
+        rutasGeneradas.push_back(camino) ;//se agrega a la lista de rutas generadas  ; 
         cout<<endl ;
         imprimirCamino (Principal , id1 , camino) ;
         cout<<endl ;
@@ -343,7 +344,21 @@ void menuConsultas() {
 
 };
 
+//!REPORTEES--------------------------------------------------------------------------
 
+void menuRutasCortas() { 
+
+    if (rutasGeneradas.empty() ) { 
+        cout<<ROJO_CLARO<<"NO se han generado rutas minimas en esta sesion "<<RESET<<endl;
+        this_thread::sleep_for(chrono::seconds(1));
+        return ;
+    }
+    if(GenerarArchivoRutasMinimas()){ 
+        cout<<VERDE<<"Archivo generado correctamente"<<RESET<<endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+        archivosRUTASMINIMAS= contarArchivosConPrefijo(NOMBRE_ARCHIVO_RUTAS) ;
+    } ; 
+}
 
 
 
@@ -369,6 +384,22 @@ void menuReportes() {
             cout << ROJO << "Solo opciones del 0 al 3.\n" << RESET;
             this_thread::sleep_for(chrono::seconds(1));
             continue;
+        }
+
+        switch (o) { 
+
+            case 1 : {
+                menuRutasCortas() ; 
+            }
+
+            case 2 : {
+
+            }
+            case 3 : {
+
+            }
+            
+
         }
     }
     while (o!=0) ;
