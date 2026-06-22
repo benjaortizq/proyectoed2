@@ -223,7 +223,6 @@ void rutamascortaentreGalaxias() {
 
 void MenuConsultasRutasdesdeGalaxia () { 
     int o ;
-    bool a = true ;
     do  {
 
         cout  << CIAN << "--------------Lista de todas las Galaxias--------------"<<RESET<<endl ;
@@ -243,12 +242,11 @@ void MenuConsultasRutasdesdeGalaxia () {
             this_thread::sleep_for(chrono::seconds(1));
             continue;
         }
-        this_thread::sleep_for(chrono::milliseconds(100));
-
         Principal.imprimirAdyacencia(t) ;
+        this_thread::sleep_for(chrono::milliseconds(1500));
         break;
 
-    }while (a) ;
+    }while (true) ;
 }
 
 void arbolConexiones(Grafo&g ) {    
@@ -258,6 +256,36 @@ void arbolConexiones(Grafo&g ) {
 
 
 void historialdeViajes() { 
+    int o ; 
+
+    do {
+        cout  << CIAN << "----------------Lista de todas las Naves---------------"<<RESET<<endl ;
+        cout<<endl ;
+        imprimirNaves (naves);
+        cout<<endl ;cout<<endl ;
+        cout<<"Escriba el numero de nave a consultar (o 0 para volver): " ;
+        o=leerOpcion () ;
+        if (o==0) { 
+            break ;
+        }
+        cout<<endl ;
+        string id = "nave-" + to_string(o) ;
+        Nave t = buscarNave (naves,id) ; 
+        if (t.nombre == "") { 
+            cout<< ROJO<<"Entrada invalida. La nave no existe"<<RESET<<endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue;
+        }
+        
+        imprimirViajesDeNave(t) ;
+        this_thread::sleep_for(chrono::milliseconds(1500));
+        break ; 
+
+
+    }
+
+    while (true) ;
+
 
 } ; 
 

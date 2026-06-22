@@ -283,3 +283,59 @@ void asignarHistorialANaves (vector<Nave> &naves, vector<Viaje> &viajes) {
     }
 }
 
+
+// Busca una nave por id en el vector. Devuelve la nave (copia) si la encuentra,
+// o una Nave vacia si no existe.
+Nave buscarNave (const vector<Nave> &naves, const string &id) {
+    for (const Nave &n : naves) {
+        if (n.id == id) {
+            return n;
+        }
+    }
+    return Nave();
+}
+
+
+// Imprime todas las naves de un vector en formato tabla.
+void imprimirNaves (const vector<Nave> &naves) {
+    cout << left;
+    cout << setw(10) << "ID" << setw(12) << "CODIGO" << setw(26) << "NOMBRE"
+         << setw(12) << "CAPACIDAD" << setw(11) << "VEL.MAX" << setw(8) << "ACTIVA"
+         << setw(9) << "VIAJES" << endl;
+    cout << string(88, '-') << endl;
+
+    for (const Nave &n : naves) {
+        cout << setw(10) << n.id << setw(12) << n.codigo << setw(26) << n.nombre
+             << setw(12) << n.capacidad << setw(11) << n.velocidad_Max
+             << setw(8) << (n.activa ? "si" : "no")
+             << setw(9) << n.historial.size() << endl;
+    }
+    cout << "Total: " << naves.size() << " naves" << endl;
+}
+
+
+// Imprime, en formato tabla, los viajes que ha hecho una nave (su historial).
+void imprimirViajesDeNave (const Nave &nave) {
+    cout << "Historial de viajes de " << nave.id;
+    if (!nave.nombre.empty()) cout << " (" << nave.nombre << ")";
+    cout << ":" << endl;
+
+    if (nave.historial.empty()) {
+        cout << "(esta nave no tiene viajes registrados)" << endl;
+        return;
+    }
+
+    cout << left;
+    cout << setw(11) << "VIAJE" << setw(13) << "FECHA" << setw(11) << "RUTA"
+         << setw(20) << "ORIGEN" << setw(20) << "DESTINO"
+         << setw(11) << "COSTO" << setw(9) << "EXITOSO" << endl;
+    cout << string(95, '-') << endl;
+
+    for (const Viaje &v : nave.historial) {
+        cout << setw(11) << v.id << setw(13) << v.fecha << setw(11) << v.ruta_id
+             << setw(20) << v.origen_nombre << setw(20) << v.destino_nombre
+             << setw(11) << v.costo_real << setw(9) << (v.exitoso ? "si" : "no") << endl;
+    }
+    cout << "Total: " << nave.historial.size() << " viajes" << endl;
+}
+

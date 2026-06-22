@@ -16,7 +16,7 @@ void dibujarGrafo (const Grafo &g, const vector<Ruta> &resaltadas) {
     const int MARGEN = 150;   // espacio para que los nodos no toquen el borde
 
     // Conjunto con los id de las rutas a resaltar, para buscarlas en O(log n).
-    set<string> idsResaltadas;
+    set<string> idsResaltadas;  
     for (const Ruta &r : resaltadas) {
         idsResaltadas.insert(r.id);
     }
