@@ -6,18 +6,26 @@
 using namespace std ;
 
 
-struct Grafo { 
+// Una entrada de la lista de adyacencia: una galaxia y todas las rutas que la tocan.
+struct Adyacencia {
+    Galaxia galaxia ;        // el nodo
+    vector<Ruta> rutas ;     // rutas conectadas a esa galaxia
+} ;
+
+
+struct Grafo {
     int totalNodos;
     int totalAristas;
     bool esDirigido;
     string version;
     vector<Galaxia> galaxias;
     vector<Ruta> rutas;
+    vector<Adyacencia> listaAdyacencia;   // se llena con crearListaAdyacencia()
 
-    Grafo () { 
-        this->totalAristas = this->totalNodos = 0 ; 
-        this->esDirigido = false ; 
-        this->version = "" ; 
+    Grafo () {
+        this->totalAristas = this->totalNodos = 0 ;
+        this->esDirigido = false ;
+        this->version = "" ;
     }
 
     void print () {
@@ -39,6 +47,40 @@ struct Grafo {
         }
         cout << "  ]" << endl;
         cout << "}" << endl;
+    }
+
+
+    // ===================== LISTA DE ADYACENCIA =====================
+
+    // Construye la lista de adyacencia: por cada galaxia, todas las rutas que la
+    // tocan. Como el grafo es NO dirigido, una ruta A-B aparece tanto en la
+    // entrada de A como en la de B. Llamar DESPUES de cargar el grafo del endpoint.
+    void crearListaAdyacencia () {
+        this->listaAdyacencia.clear();
+
+        for (const Galaxia &gal : this->galaxias) {
+            Adyacencia entrada;
+            entrada.galaxia = gal;
+
+            for (const Ruta &r : this->rutas) {
+                if (r.origen_id == gal.id || r.destino_id == gal.id) {
+                    entrada.rutas.push_back(r);
+                }
+            }
+
+            this->listaAdyacencia.push_back(entrada);
+        }
+    }
+
+    // Devuelve todas las rutas posibles desde una galaxia (segun la lista de
+    // adyacencia ya construida). Vector vacio si la galaxia no existe.
+    vector<Ruta> rutasDesdeGalaxia (const string &id) {
+        for (const Adyacencia &entrada : this->listaAdyacencia) {
+            if (entrada.galaxia.id == id) {
+                return entrada.rutas;
+            }
+        }
+        return vector<Ruta>();
     }
 
 
@@ -129,6 +171,7 @@ struct Grafo {
         }
         this->rutas.push_back(nueva);
         this->totalAristas = (int)this->rutas.size();
+        crearListaAdyacencia() ;
         return true;
     }
 
@@ -149,6 +192,7 @@ struct Grafo {
             if (this->rutas[i].id == id) {
                 this->rutas.erase(this->rutas.begin() + i);
                 this->totalAristas = (int)this->rutas.size();
+                crearListaAdyacencia();
                 return true;
             }
         }

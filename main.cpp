@@ -1,4 +1,5 @@
 #include "menu.cpp"
+
 int main () {
     cout<<endl ;
     cout<<endl ;
@@ -16,7 +17,7 @@ int main () {
     obtenerNaves () ;
     obtenerViajes () ;
     asignarHistorialANaves(naves, viajes) ;   // copia a cada nave sus viajes
-
+    Principal.crearListaAdyacencia() ;
 
     menu() ;
 
