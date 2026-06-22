@@ -11,6 +11,10 @@ int main () {
 
     //!PRECARGA DE DATOS 
 
+    SetTraceLogLevel(LOG_WARNING);
+
+    //algorimos inicialews
+
     Grafo Principal ; 
     obtenerGrafoKurskal (Principal) ;
     rellenarDatosGrafo (Principal);
@@ -18,6 +22,8 @@ int main () {
     obtenerViajes () ;
     asignarHistorialANaves(naves, viajes) ;   // copia a cada nave sus viajes
     Principal.crearListaAdyacencia() ;
+
+    
 
     menu() ;
 

@@ -94,4 +94,113 @@ void dibujarGrafo (const Grafo &g, const vector<Ruta> &resaltadas) {
 }
 
 
+// Dibuja el ARBOL (MST) de Kruskal en una ventana 2D, IGNORANDO las coordenadas
+// reales de las galaxias. Genera un layout propio por niveles (BFS): elige una
+// raiz, reparte los nodos por profundidad (nivel 0 arriba, hijos debajo) y los
+// distribuye horizontalmente. Recibe el grafo que devuelve kruskal().
+void GraficarARBOL (const Grafo &arbol) {
+    const int ANCHO = 1500;
+    const int ALTO  = 800;
+    const int MARGEN = 90;
+
+    // 1. Lista de adyacencia del arbol (no dirigido: cada arista va a ambos lados).
+    map<string, vector<string>> ady;
+    for (const Ruta &r : arbol.rutas) {
+        ady[r.origen_id].push_back(r.destino_id);
+        ady[r.destino_id].push_back(r.origen_id);
+    }
+
+    // Diccionario id -> galaxia, para mostrar el nombre de cada nodo.
+    map<string, Galaxia> nodo;
+    for (const Galaxia &gal : arbol.galaxias) nodo[gal.id] = gal;
+
+    // 2. BFS para repartir los nodos por niveles. El bucle externo sobre todas
+    //    las galaxias hace que tambien funcione si el arbol es un bosque
+    //    (varios componentes desconectados): cada uno arranca una nueva raiz.
+    map<string, bool> visitado;
+    map<string, int>  nivel;
+    vector<vector<string>> porNivel;   // porNivel[L] = ids de galaxias en ese nivel
+
+    for (const Galaxia &raiz : arbol.galaxias) {
+        if (visitado[raiz.id]) continue;
+
+        visitado[raiz.id] = true;
+        nivel[raiz.id] = 0;
+        queue<string> cola;
+        cola.push(raiz.id);
+
+        while (!cola.empty()) {
+            string u = cola.front();
+            cola.pop();
+
+            int L = nivel[u];
+            if ((int)porNivel.size() <= L) porNivel.resize(L + 1);
+            porNivel[L].push_back(u);
+
+            for (const string &v : ady[u]) {
+                if (!visitado[v]) {
+                    visitado[v] = true;
+                    nivel[v] = L + 1;
+                    cola.push(v);
+                }
+            }
+        }
+    }
+
+    // 3. Calcular la posicion en pantalla de cada nodo segun su nivel.
+    map<string, Vector2> pos;
+    int niveles = (int)porNivel.size();
+    float altoNivel = (niveles <= 1) ? 0 : (float)(ALTO - 2 * MARGEN) / (niveles - 1);
+
+    for (int L = 0; L < niveles; L++) {
+        int k = (int)porNivel[L].size();
+        for (int i = 0; i < k; i++) {
+            float px = MARGEN + (i + 1.0f) / (k + 1.0f) * (ANCHO - 2 * MARGEN);
+            float py = (niveles <= 1) ? ALTO / 2.0f : MARGEN + L * altoNivel;
+            pos[porNivel[L][i]] = { px, py };
+        }
+    }
+
+    // 4. Dibujar.
+    InitWindow(ANCHO, ALTO, "Arbol de Kruskal (MST) - Proyecto ED");
+    SetTargetFPS(30);
+
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(Color{ 12, 12, 28, 255 });
+
+        // a. Aristas del arbol (verdes, gruesas).
+        for (const Ruta &r : arbol.rutas) {
+            if (!pos.count(r.origen_id) || !pos.count(r.destino_id)) continue;
+            Vector2 a = pos[r.origen_id];
+            Vector2 b = pos[r.destino_id];
+            DrawLineEx(a, b, 2.5f, GREEN);
+
+            int mx = (int)((a.x + b.x) / 2.0f);
+            int my = (int)((a.y + b.y) / 2.0f);
+            DrawText(TextFormat("%.0f", r.costo), mx, my, 11, Color{ 180, 220, 180, 255 });
+        }
+
+        // b. Nodos (circulo + nombre; si no hay nombre, se usa el id).
+        for (const Galaxia &gal : arbol.galaxias) {
+            if (!pos.count(gal.id)) continue;
+            Vector2 p = pos[gal.id];
+            DrawCircleV(p, 10, SKYBLUE);
+            const string &etiqueta = gal.nombre.empty() ? gal.id : gal.nombre;
+            DrawText(etiqueta.c_str(), (int)p.x + 12, (int)p.y - 6, 12, RAYWHITE);
+        }
+
+        // c. Info.
+        DrawText(TextFormat("Arbol de Kruskal  |  Galaxias: %d   Aristas: %d",
+                            (int)arbol.galaxias.size(), (int)arbol.rutas.size()),
+                 10, 10, 18, YELLOW);
+        DrawText("ESC para salir", 10, ALTO - 24, 14, GRAY);
+
+        EndDrawing();
+    }
+
+    CloseWindow();
+}
+
+
 
