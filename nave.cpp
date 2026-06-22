@@ -1,5 +1,7 @@
 #pragma once
+#include <vector>
 #include "galaxia.cpp"
+#include "historial.cpp"
 
 using namespace std  ;
 
@@ -10,6 +12,7 @@ struct Nave {
     int capacidad ;
     int velocidad_Max ;
     bool activa;
+    vector<Viaje> historial ;   // copias de los viajes realizados por esta nave
 
     public :
 

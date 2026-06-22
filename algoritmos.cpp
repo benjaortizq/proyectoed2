@@ -167,3 +167,67 @@ vector<Ruta> dijkstra (const Grafo &g, const string &origen, const string &desti
     return camino;
 }
 
+
+// ---------------------------------------------------------------------------
+// CRUD de VIAJES (historial). Todas reciben el vector<Viaje> global como
+// fuente de la verdad y lo modifican por referencia.
+// ---------------------------------------------------------------------------
+
+// Devuelve un puntero al viaje con ese id, o nullptr si no existe.
+Viaje* buscarViaje (vector<Viaje> &viajes, const string &id) {
+    for (Viaje &v : viajes) {
+        if (v.id == id) return &v;
+    }
+    return nullptr;
+}
+
+// Agrega un viaje. Falla (false) si ya existe uno con el mismo id.
+bool agregarViaje (vector<Viaje> &viajes, const Viaje &nuevo) {
+    if (buscarViaje(viajes, nuevo.id) != nullptr) {
+        return false;   // id repetido
+    }
+    viajes.push_back(nuevo);
+    return true;
+}
+
+// Edita los datos de un viaje existente (identificado por id).
+bool editarViaje (vector<Viaje> &viajes, const string &id, string nave_id, string ruta_id,
+                  string fecha, float costo_real, bool exitoso,
+                  string nave_nombre, string origen_nombre, string destino_nombre) {
+    Viaje* v = buscarViaje(viajes, id);
+    if (v == nullptr) {
+        return false;   // no existe
+    }
+    v->Editar(nave_id, ruta_id, fecha, costo_real, exitoso, nave_nombre, origen_nombre, destino_nombre);
+    return true;
+}
+
+// Elimina el viaje con ese id.
+bool eliminarViaje (vector<Viaje> &viajes, const string &id) {
+    for (int i = 0; i < (int)viajes.size(); i++) {
+        if (viajes[i].id == id) {
+            viajes.erase(viajes.begin() + i);
+            return true;
+        }
+    }
+    return false;   // no existe
+}
+
+// Devuelve todos los viajes de una nave (para "historial de viajes por nave").
+vector<Viaje> historialDeNave (vector<Viaje> &viajes, const string &nave_id) {
+    vector<Viaje> resultado;
+    for (const Viaje &v : viajes) {
+        if (v.nave_id == nave_id) resultado.push_back(v);
+    }
+    return resultado;
+}
+
+// Copia, dentro de cada nave, los viajes que le corresponden (segun nave_id).
+// Usa el vector<Viaje> global como fuente; el historial de cada nave es una
+// copia de conveniencia.
+void asignarHistorialANaves (vector<Nave> &naves, vector<Viaje> &viajes) {
+    for (Nave &n : naves) {
+        n.historial = historialDeNave(viajes, n.id);
+    }
+}
+

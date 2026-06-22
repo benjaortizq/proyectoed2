@@ -12,6 +12,9 @@ using namespace std ;
 #define GALAXIA_ENDPOINT "https://galaxias-mock-api.onrender.com/galaxia/"
 #define RUTA_ENDPOINT "https://galaxias-mock-api.onrender.com/rutas/"
 #define GRAFO_ENDPOINT "https://galaxias-mock-api.onrender.com/grafo/"//grafo completo con todos los datos de los nodos
+#define HISTORIAL_ENDPOINT "https://galaxias-mock-api.onrender.com/Historial/"
+#define NAVES_ENDPOINT "https://galaxias-mock-api.onrender.com/naves"
+
 
 static size_t writeCallback (void *contents, size_t size, size_t nmemb, void *userp) {
 	string *response = static_cast<string*>(userp);
@@ -93,8 +96,33 @@ static vector<string> splitObjects (const string &arrayContent) {
 	return objects;
 }
 
+// Devuelve el contenido del PRIMER arreglo [...] que aparezca en el json.
+// Sirve tanto si la respuesta es una lista directa "[ {...}, {...} ]" como si
+// viene envuelta en un objeto "{ \"algo\": [ {...} ] }".
+static string getFirstArray (const string &json) {
+	size_t arrayStart = json.find('[');
+	if (arrayStart == string::npos) {
+		return "";
+	}
 
-void GetGrafoURL (Grafo&g , string URL) { // usable solo con /kuyrskal / grafo 
+	int depth = 0;
+	for (size_t index = arrayStart; index < json.size(); ++index) {
+		if (json[index] == '[') {
+			depth++;
+		}
+		else if (json[index] == ']') {
+			depth--;
+			if (depth == 0) {
+				return json.substr(arrayStart + 1, index - arrayStart - 1);
+			}
+		}
+	}
+
+	return "";
+}
+
+
+void GetGrafoURL (Grafo&g , string URL) { // usable solo con /kuyrskal / grafo
 	string response = fetchUrl(URL);
 
 	g = Grafo();
@@ -214,8 +242,81 @@ void fillGalaxiaData(Grafo& g) {
 	for (Galaxia& galaxia : g.galaxias) {
 		map<string, Galaxia>::iterator it = galaxiasPorId.find(galaxia.id);
 		if (it != galaxiasPorId.end()) {
-			galaxia = it->second;   
+			galaxia = it->second;
 		}
 	}
 
+}
+
+
+// Trae todos los viajes (historial) del endpoint y los guarda en "viajes".
+void getHistorial (vector<Viaje>& viajes) {
+	viajes.clear();
+
+	string response = fetchUrl(HISTORIAL_ENDPOINT);
+	if (response.empty()) return;
+
+	string arrayContent = getFirstArray(response);
+	vector<string> objects = splitObjects(arrayContent);
+
+	for (const string& object : objects) {
+		Viaje v;
+		smatch m;
+
+		if (regex_search(object, m, regex("\"id\"\\s*:\\s*\"([^\"]*)\"")))
+			v.id = m[1].str();
+		if (regex_search(object, m, regex("\"nave_id\"\\s*:\\s*\"([^\"]*)\"")))
+			v.nave_id = m[1].str();
+		if (regex_search(object, m, regex("\"ruta_id\"\\s*:\\s*\"([^\"]*)\"")))
+			v.ruta_id = m[1].str();
+		if (regex_search(object, m, regex("\"fecha\"\\s*:\\s*\"([^\"]*)\"")))
+			v.fecha = m[1].str();
+		if (regex_search(object, m, regex("\"costo_real\"\\s*:\\s*(-?[0-9]+(?:\\.[0-9]+)?)")))
+			v.costo_real = stof(m[1].str());
+		if (regex_search(object, m, regex("\"exitoso\"\\s*:\\s*(true|false)")))
+			v.exitoso = (m[1].str() == "true");
+		if (regex_search(object, m, regex("\"nave_nombre\"\\s*:\\s*\"([^\"]*)\"")))
+			v.nave_nombre = m[1].str();
+		if (regex_search(object, m, regex("\"origen_nombre\"\\s*:\\s*\"([^\"]*)\"")))
+			v.origen_nombre = m[1].str();
+		if (regex_search(object, m, regex("\"destino_nombre\"\\s*:\\s*\"([^\"]*)\"")))
+			v.destino_nombre = m[1].str();
+
+		if (!v.id.empty()) viajes.push_back(v);
+	}
+}
+
+
+// Trae todas las naves del endpoint y las guarda en "naves".
+void getNaves (vector<Nave>& naves) {
+	naves.clear();
+
+	string response = fetchUrl(NAVES_ENDPOINT);
+	if (response.empty()) return;
+
+	string arrayContent = getFirstArray(response);
+	vector<string> objects = splitObjects(arrayContent);
+
+	for (const string& object : objects) {
+		Nave n;
+		smatch m;
+
+		if (regex_search(object, m, regex("\"id\"\\s*:\\s*\"([^\"]*)\"")))
+			n.id = m[1].str();
+		if (regex_search(object, m, regex("\"codigo\"\\s*:\\s*\"([^\"]*)\"")))
+			n.codigo = m[1].str();
+		if (regex_search(object, m, regex("\"nombre\"\\s*:\\s*\"([^\"]*)\"")))
+			n.nombre = m[1].str();
+		if (regex_search(object, m, regex("\"capacidad\"\\s*:\\s*([0-9]+)")))
+			n.capacidad = stoi(m[1].str());
+		// el campo de velocidad podria llamarse de varias formas en la API:
+		if (regex_search(object, m, regex("\"velocidad_maxima\"\\s*:\\s*([0-9]+)")) ||
+		    regex_search(object, m, regex("\"velocidad_max\"\\s*:\\s*([0-9]+)")) ||
+		    regex_search(object, m, regex("\"velocidad\"\\s*:\\s*([0-9]+)")))
+			n.velocidad_Max = stoi(m[1].str());
+		if (regex_search(object, m, regex("\"activa\"\\s*:\\s*(true|false)")))
+			n.activa = (m[1].str() == "true");
+
+		if (!n.id.empty()) naves.push_back(n);
+	}
 }
