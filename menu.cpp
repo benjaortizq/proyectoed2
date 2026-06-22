@@ -87,7 +87,7 @@ void obtenerViajes () {
     while (tarea.wait_for(chrono::milliseconds(400)) != future_status::ready) {
         puntos = (puntos % 3) + 1;            // cicla 1, 2, 3, 1, 2, 3...
         string animacion(puntos, '.');        // "." , ".." , "..."
-        cout << "\r" << VERDE_CLARO << "Obteniendo Historial;" << animacion << "   " << RESET << flush;
+        cout << "\r" << VERDE_CLARO << "Obteniendo Historial" << animacion << "   " << RESET << flush;
     }
 
     tarea.get();   
@@ -105,7 +105,7 @@ void obtenerGrafoKurskal (Grafo &g) {
     while (tarea.wait_for(chrono::milliseconds(400)) != future_status::ready) {
         puntos = (puntos % 3) + 1;            // cicla 1, 2, 3, 1, 2, 3...
         string animacion(puntos, '.');        // "." , ".." , "..."
-        cout << "\r" << AMARILLO << "Obteniendo grafo" << animacion << "   " << RESET << flush;
+        cout << "\r" << AMARILLO << "Conectando con EndPoint " << animacion << "   " << RESET << flush;
     }
 
     tarea.get();   
@@ -135,18 +135,68 @@ void rellenarDatosGrafo (Grafo &g) {
 //!MENUS-------------------------------------------------
 
 
+void rutamascortaentreGalaxias() {
+    int g1 ;
+    int g2 ;
+    do {
+        cout  << CIAN << "--------------Lista de todas las Galaxias--------------"<<RESET<<endl ;
+        cout<<endl ;
+        Principal.printGalaxias() ;
+        cout<<endl ;cout<<endl ;
+        cout<<"Escriba el numero de la galaxia origen : " ;
+
+        g1=leerOpcion () ;
+        string id1 = "galaxia-" + to_string(g1) ;
+        Galaxia t1 = Principal.getGalaxia (id1) ;
+        cout<<endl ;
+
+        if (t1.id == "") {                            // si getGalaxia no la encontro
+            cout<< ROJO<<"Entrada invalida. La galaxia no existe"<<RESET<<endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue;
+        }
+
+        this_thread::sleep_for(chrono::milliseconds(100));
+
+        cout<<"Escriba el numero de la galaxia destino : " ;
+
+        g2=leerOpcion () ;
+        string id2 = "galaxia-" + to_string(g2) ;
+        Galaxia t2 = Principal.getGalaxia (id2) ;
+        cout<<endl ;
+
+        if (t2.id == "") {
+            cout<< ROJO<<"Entrada invalida. La galaxia no existe"<<RESET<<endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue;
+        }
+
+        // Calcular el camino de menor costo y mostrarlo.
+        vector<Ruta> camino = dijkstra (Principal , id1 , id2) ;
+        cout<<endl ;
+        imprimirCamino (Principal , id1 , camino) ;
+        cout<<endl ;
+
+        // Si hubo camino, abrir la ventana con esa ruta resaltada en rojo.
+        if (!camino.empty()) {
+            dibujarGrafo (Principal , camino) ;
+        }
+        break;
+
+    }while (true) ;
+
+}
+
 void MenuConsultasRutasdesdeGalaxia () { 
-
     int o ;
-    bool a ;
-
+    bool a = true ;
     do  {
 
         cout  << CIAN << "--------------Lista de todas las Galaxias--------------"<<RESET<<endl ;
         cout<<endl ;
         Principal.printGalaxias() ;
         cout<<endl ;cout<<endl ;
-        cout<<"Escriba el numero de galaxia a consultar :" ;
+        cout<<"Escriba el numero de galaxia a consultar : " ;
         o=leerOpcion () ;
         cout<<endl ;
         string id = "galaxia-" + to_string(o) ;
@@ -156,10 +206,9 @@ void MenuConsultasRutasdesdeGalaxia () {
             this_thread::sleep_for(chrono::seconds(1));
             continue;
         }
-        this_thread::sleep_for(chrono::seconds(1));
+        this_thread::sleep_for(chrono::milliseconds(100));
 
         Principal.imprimirAdyacencia(t) ;
-        a= false ;
         break;
 
     }while (a) ;
@@ -203,11 +252,14 @@ void menuConsultas() {
             }
 
             case 2 : {
-
+                rutamascortaentreGalaxias() ;
+                continue ;
                 }
-            
-            case 3: 
-            {arbolConexiones (Principal) ;}
+
+            case 3: {
+                arbolConexiones (Principal) ;
+                continue ;
+            }
         }
     }
     while (o!=0) ;

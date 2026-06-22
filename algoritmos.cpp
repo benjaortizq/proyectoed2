@@ -99,11 +99,19 @@ string otroExtremo (const Ruta &r, const string &nodo) {
 
 vector<Ruta> dijkstra (const Grafo &g, const string &origen, const string &destino) {
     // 1. Lista de adyacencia: por cada nodo, las rutas que lo tocan.
-    //    Como es no dirigido, cada ruta se agrega a sus DOS extremos.
+    //    Si el grafo ya tiene su listaAdyacencia construida (crearListaAdyacencia),
+    //    la reusamos. Si no, la armamos aqui a partir de las rutas (fallback).
     map<string, vector<Ruta>> adyacencia;
-    for (const Ruta &r : g.rutas) {
-        adyacencia[r.origen_id].push_back(r);
-        adyacencia[r.destino_id].push_back(r);
+    if (!g.listaAdyacencia.empty()) {
+        for (const Adyacencia &a : g.listaAdyacencia) {
+            adyacencia[a.galaxia.id] = a.rutas;
+        }
+    } else {
+        // Como es no dirigido, cada ruta se agrega a sus DOS extremos.
+        for (const Ruta &r : g.rutas) {
+            adyacencia[r.origen_id].push_back(r);
+            adyacencia[r.destino_id].push_back(r);
+        }
     }
 
     // 2. Estructuras de Dijkstra.
@@ -165,6 +173,45 @@ vector<Ruta> dijkstra (const Grafo &g, const string &origen, const string &desti
 
     reverse(camino.begin(), camino.end());   // dejarlo en orden origen -> destino
     return camino;
+}
+
+
+// Imprime en formato tabla el camino que devuelve dijkstra: por cada paso muestra
+// desde que galaxia, por que ruta y hacia que galaxia se va, con su costo y tiempo.
+// "origen" es el id de la galaxia de partida (para saber por donde arranca).
+void imprimirCamino (Grafo &g, const string &origen, const vector<Ruta> &camino) {
+    if (camino.empty()) {
+        cout << "No existe una ruta entre esas galaxias." << endl;
+        return;
+    }
+
+    cout << left;
+    cout << setw(20) << "DESDE" << setw(11) << "RUTA" << setw(20) << "HACIA"
+         << setw(14) << "TIPO" << setw(10) << "COSTO" << setw(9) << "TIEMPO" << endl;
+    cout << string(84, '-') << endl;
+
+    string actual = origen;
+    float costoTotal = 0.0f;
+    float tiempoTotal = 0.0f;
+
+    for (const Ruta &r : camino) {
+        string siguiente = otroExtremo(r, actual);   // el otro extremo (no dirigido)
+
+        Galaxia desde = g.getGalaxia(actual);
+        Galaxia hacia = g.getGalaxia(siguiente);
+        string nombreDesde = desde.nombre.empty() ? actual    : desde.nombre;
+        string nombreHacia = hacia.nombre.empty() ? siguiente : hacia.nombre;
+
+        cout << setw(20) << nombreDesde << setw(11) << r.id << setw(20) << nombreHacia
+             << setw(14) << r.tipo << setw(10) << r.costo << setw(9) << r.tiempo_dias << endl;
+
+        costoTotal  += r.costo;
+        tiempoTotal += r.tiempo_dias;
+        actual = siguiente;
+    }
+
+    cout << string(84, '-') << endl;
+    cout << "Costo total: " << costoTotal << "   |   Tiempo total: " << tiempoTotal << " dias" << endl;
 }
 
 
