@@ -35,6 +35,10 @@
 
 
 using namespace std ;
+//!GENERACION DE ESTRUCTURAS AUXILIARES PARA ALMACENAMIETO DE RUTAS Y NAVES.
+
+    vector<Nave>  naves ;     // todas las naves y su estado
+    vector<Viaje> viajes ;    // todos los viajes (historial completo)
 
 int leerOpcion () {
     int opcion;
@@ -49,6 +53,44 @@ int leerOpcion () {
     return opcion;
 }
 
+//!COSAS GRAFICAS
+
+    
+
+
+void obtenerNaves () {
+    future<void> tarea = async(launch::async, []() {
+        getNaves(naves) ;
+    });
+
+    int puntos = 0;
+    while (tarea.wait_for(chrono::milliseconds(400)) != future_status::ready) {
+        puntos = (puntos % 3) + 1;            // cicla 1, 2, 3, 1, 2, 3...
+        string animacion(puntos, '.');        // "." , ".." , "..."
+        cout << "\r" << CIAN_CLARO << "Obteniendo Naves" << animacion << "   " << RESET << flush;
+    }
+
+    tarea.get();   
+
+    cout << VERDE << "Naves cargadas: " << naves.size()<< RESET << endl;
+};
+
+void obtenerViajes () {
+    future<void> tarea = async(launch::async, []() {
+        getHistorial(viajes) ;
+    });
+
+    int puntos = 0;
+    while (tarea.wait_for(chrono::milliseconds(400)) != future_status::ready) {
+        puntos = (puntos % 3) + 1;            // cicla 1, 2, 3, 1, 2, 3...
+        string animacion(puntos, '.');        // "." , ".." , "..."
+        cout << "\r" << VERDE_CLARO << "Obteniendo Historial;" << animacion << "   " << RESET << flush;
+    }
+
+    tarea.get();   
+
+    cout << VERDE <<"Viajes cargados: " << viajes.size() << RESET << endl ;
+}
 
 
 void obtenerGrafoKurskal (Grafo &g) {
@@ -84,6 +126,10 @@ void rellenarDatosGrafo (Grafo &g) {
 
     cout << "\r" << VERDE << "Datos de Galaxias obtenidas!            " << RESET << endl;
 }
+
+
+
+//!MENUS-------------------------------------------------
 
 
 

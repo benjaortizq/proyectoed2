@@ -13,18 +13,10 @@ int main () {
     Grafo Principal ; 
     obtenerGrafoKurskal (Principal) ;
     rellenarDatosGrafo (Principal);
-
-    //!GENERACION DE ESTRUCTURAS AUXILIARES PARA ALMACENAMIETO DE RUTAS Y NAVES.
-
-    vector<Nave>  naves ;     // todas las naves y su estado
-    vector<Viaje> viajes ;    // todos los viajes (historial completo)
-
-    getNaves(naves) ;
-    getHistorial(viajes) ;
+    obtenerNaves () ;
+    obtenerViajes () ;
     asignarHistorialANaves(naves, viajes) ;   // copia a cada nave sus viajes
 
-    cout << VERDE << "Naves cargadas: " << naves.size()
-         << "  | Viajes cargados: " << viajes.size() << RESET << endl ;
 
     menu() ;
 
