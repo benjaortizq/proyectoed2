@@ -72,7 +72,7 @@ struct Grafo {
         cout << left;
         cout << setw(11) << "ID" << setw(13) << "ORIGEN" << setw(13) << "DESTINO"
              << setw(14) << "TIPO" << setw(10) << "COSTO"
-             << setw(9) << "TIEMPO" << setw(7) << "ACTIVA" << endl;
+             << setw(9) << "TIEMPO (D)" << setw(7) << "ACTIVA" << endl;
         cout << string(76, '-') << endl;
 
         for (const Ruta &r : this->rutas) {

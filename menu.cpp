@@ -137,6 +137,32 @@ void rellenarDatosGrafo (Grafo &g) {
 
 void MenuConsultasRutasdesdeGalaxia () { 
 
+    int o ;
+    bool a ;
+
+    do  {
+
+        cout  << CIAN << "--------------Lista de todas las Galaxias--------------"<<RESET<<endl ;
+        cout<<endl ;
+        Principal.printGalaxias() ;
+        cout<<endl ;cout<<endl ;
+        cout<<"Escriba el numero de galaxia a consultar :" ;
+        o=leerOpcion () ;
+        cout<<endl ;
+        string id = "galaxia-" + to_string(o) ;
+        Galaxia t = Principal.getGalaxia (id) ;
+        if (t.nombre == "") { 
+            cout<< ROJO<<"Entrada invalida. La galaxia no existe"<<RESET<<endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue;
+        }
+        this_thread::sleep_for(chrono::seconds(1));
+
+        Principal.imprimirAdyacencia(t) ;
+        a= false ;
+        break;
+
+    }while (a) ;
 }
 
 void arbolConexiones(Grafo&g ) {    
