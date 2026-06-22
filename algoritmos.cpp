@@ -1,3 +1,4 @@
+#pragma once
 #include "API.cpp"
 #include <map>
 #include <queue>
@@ -66,7 +67,11 @@ Grafo kruskal (const Grafo &g) {
     mst.esDirigido = g.esDirigido;
     mst.version    = g.version;
 
-    // 1-2. Cada nodo arranca en su propio conjunto.
+    vector<Ruta> rutasOrdenadas = g.rutas;
+    sort(rutasOrdenadas.begin(), rutasOrdenadas.end(),
+         [](const Ruta &a, const Ruta &b) {
+             return a.costo < b.costo;
+         });
     UnionFind conjuntos;
     conjuntos.inicializar(g);
 

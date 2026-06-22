@@ -1,4 +1,4 @@
-#include "algoritmos.cpp"   // trae Grafo, GetGrafoURL, fillGalaxiaData, kruskal, dijkstra
+#include "archivos.cpp"   // trae Grafo, GetGrafoURL, fillGalaxiaData, kruskal, dijkstra
 #include "raylib.h"
 #include <cmath>
 #include <set>

@@ -3,7 +3,7 @@
 #include <future>
 
 #include "gui.cpp"
-#include "archivos.cpp"
+
 
 #define RESET   "\033[0m"
 #define ROJO    "\033[31m"
@@ -275,7 +275,7 @@ void menuConsultas() {
         cout <<"Escriba una opcion : " ; 
 
         o= leerOpcion() ;
-        if (o < 0 || o > 3) {
+        if (o < 0 || o > 4) {
             cout << ROJO << "Solo opciones del 0 al 4.\n" << RESET;
             this_thread::sleep_for(chrono::seconds(1));
             continue;
