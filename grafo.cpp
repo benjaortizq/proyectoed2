@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <iomanip>
+#include <algorithm>
 #include "nave.cpp"
 #include "ruta.cpp"
 
@@ -114,6 +115,48 @@ struct Grafo {
             return *g;
         }
         return Galaxia();
+    }
+
+    // Cuenta cuantas rutas tocan a una galaxia (su grado de conectividad).
+    int conectividadDe (const string &id) {
+        int grado = 0;
+        for (const Ruta &r : this->rutas) {
+            if (r.origen_id == id || r.destino_id == id) grado++;
+        }
+        return grado;
+    }
+
+    // Desglosa las galaxias ORDENADAS por conectividad (de mayor a menor),
+    // mostrando cada galaxia con su numero de conexiones y sus rutas.
+    void printPorConectividad () {
+        // 1. Armar pares (grado, galaxia).
+        vector<pair<int, Galaxia>> ranking;
+        for (const Galaxia &gal : this->galaxias) {
+            ranking.push_back({ conectividadDe(gal.id), gal });
+        }
+
+        // 2. Ordenar por grado descendente.
+        sort(ranking.begin(), ranking.end(),
+             [](const pair<int, Galaxia> &a, const pair<int, Galaxia> &b) {
+                 return a.first > b.first;
+             });
+
+        // 3. Desglosar cada galaxia y sus rutas en ese orden.
+        for (const pair<int, Galaxia> &par : ranking) {
+            const Galaxia &gal = par.second;
+            cout << par.first << " conexiones | " << gal.id;
+            if (!gal.nombre.empty()) cout << " (" << gal.nombre << ")";
+            cout << endl;
+
+            for (const Ruta &r : this->rutas) {
+                if (r.origen_id == gal.id || r.destino_id == gal.id) {
+                    string otro = (r.origen_id == gal.id) ? r.destino_id : r.origen_id;
+                    cout << "      -> " << otro << "   [" << r.id
+                         << ", costo " << r.costo << "]" << endl;
+                }
+            }
+            cout << endl;
+        }
     }
 
 

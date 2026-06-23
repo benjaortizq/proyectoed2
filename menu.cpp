@@ -205,11 +205,20 @@ void rutamascortaentreGalaxias() {
             continue;
         }
 
-        // Calcular el camino de menor costo y mostrarlo.
-        vector<Ruta> camino = dijkstra (Principal , id1 , id2) ;
-        rutasGeneradas.push_back(camino) ;//se agrega a la lista de rutas generadas  ; 
+        // Calcular el camino de menor costo en CADA red (una sola vez).
+        vector<Ruta> camino  = dijkstra (Principal , id1 , id2) ;   // red original
+        vector<Ruta> caminoK = dijkstra (k , id1 , id2) ;           // red optimizada (Kruskal)
+
+        // Guardar en paralelo para los reportes (mismo par en ambos vectores).
+        rutasGeneradas.push_back( camino ) ;
+        rutasGeneradasKurskal.push_back( caminoK ) ;
+
         cout<<endl ;
+        cout<<"Ruta en el grafo Principal: " <<endl ;
         imprimirCamino (Principal , id1 , camino) ;
+        cout<<endl ;
+        cout<<"Ruta en el grafo Optimizado : " <<endl ;
+        imprimirCamino (k , id1 , caminoK) ;        // <- ahora el camino de Kruskal
         cout<<endl ;
 
         // Si hubo camino, abrir la ventana con esa ruta resaltada en rojo.
@@ -361,6 +370,7 @@ void menuRutasCortas() {
     } ; 
     cout<<ROJO<<"Error en la creacion del archivo ;"<<RESET<<endl ;
     this_thread::sleep_for(chrono::seconds(1));
+    return ;
 }
 
 void menuRutasExpansion() { 
@@ -374,9 +384,21 @@ void menuRutasExpansion() {
     } ; 
     cout<<ROJO<<"Error en la creacion del archivo ;"<<RESET<<endl ;
     this_thread::sleep_for(chrono::seconds(1));
+    return ;
 
 }
 
+void menuEstadisticas () { 
+    if (generarArchivoEstadisticas (Principal,k)) { 
+        cout<<VERDE<<"Archivo generado correctamente"<<RESET<<endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+        archivoESTADISTICAS = contarArchivosConPrefijo (NOMBRE_ARCHIVO_ESTADISTICAS) ;
+        return ;
+    }
+    cout<<ROJO<<"Error en la creacion del archivo ;"<<RESET<<endl ;
+    this_thread::sleep_for(chrono::seconds(1));
+    return ;
+}
 
 
 
@@ -393,7 +415,7 @@ void menuReportes() {
         cout  << VERDE_CLARO << "========= Menu de Reportes ========="<<RESET<<endl ;
         cout <<"1. Generar Archivo con las rutas mas cortas generadas "<<endl ; 
         cout <<"2. Generar Archivo de Arbol de Expansion "<<endl ; 
-        cout <<"3. Generar Informe de estadisticas"<<endl ; 
+        cout <<"3. Generar Archivo de Estadisticas "<<endl ; 
         cout <<"0. Volver "<<endl ;cout<<endl ;
         cout <<"Escriba una opcion : " ; 
         o= leerOpcion() ;
@@ -407,14 +429,19 @@ void menuReportes() {
 
             case 1 : {
                 menuRutasCortas() ; 
+                continue;
             }
 
             case 2 : {
                 menuRutasExpansion() ; 
+                continue;
 
 
             }
             case 3 : {
+                menuEstadisticas () ;
+                continue;
+
 
             }
             
