@@ -675,13 +675,288 @@ void smCrearRuta () {
 }
 
 
-void smEditarRuta() {   
+void smEditarRuta() {
+    Ruta* r = nullptr ;
+
+    // Seleccionar la ruta a editar: se listan y se pide el numero -> "ruta-N".
+    while (true) {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout << ITALICA << VERDE_CLARO << "---------- Editar Ruta ----------" << RESET << endl ;
+        cout << endl ;
+        Principal.printRutas() ;
+        cout << endl ;
+        cout << "Escriba el numero de la ruta a editar (0 para volver): " ;
+
+        int o = leerOpcion() ;
+        if (o == 0) {
+            return ;
+        }
+        if (o < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+        string id = "ruta-" + to_string(o) ;
+        r = Principal.buscarRuta(id) ;
+        if (r == nullptr) {                       // puntero vacio -> no existe
+            cout << ROJO << "La ruta no existe." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // Mostrar la ruta encontrada con formato claro.
+    cout << endl ;
+    cout << VERDE << "Editando la siguiente ruta:" << RESET << endl ;
+    r->print() ;
+    cout << endl ;
+    cout << AMARILLO << "Para cada campo escriba el nuevo valor. Enter VACIO mantiene el valor actual." << RESET << endl ;
+    cout << endl ;
+
+    // Variables para los nuevos valores (parten del valor actual).
+    string nuevoOrigen  = r->origen_id ;
+    string nuevoDestino = r->destino_id ;
+    string nuevoTipo    = r->tipo ;
+    float  nuevoCosto   = r->costo ;
+    float  nuevoTiempo  = r->tiempo_dias ;
+    bool   nuevaActiva  = r->activa ;
+
+    string entrada ;
+
+    // origen_id (se pide numero de galaxia; debe existir).
+    while (true) {
+        cout << "origen_id (actual: " << r->origen_id << ") -> nuevo numero de galaxia: " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) {           // Enter vacio -> mantener el valor actual
+            break ;
+        }
+        int g ;
+        try { g = stoi(entrada) ; }
+        catch (...) {
+            cout << ROJO << "Numero invalido." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        string id = "galaxia-" + to_string(g) ;
+        if (Principal.getGalaxia(id).id == "") {
+            cout << ROJO << "Esa galaxia no existe." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        nuevoOrigen = id ;
+        break ;
+    }
+
+    // destino_id (debe existir y ser distinto del nuevo origen).
+    while (true) {
+        cout << "destino_id (actual: " << r->destino_id << ") -> nuevo numero de galaxia: " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) {           // Enter vacio -> mantener el valor actual
+            break ;
+        }
+        int g ;
+        try { g = stoi(entrada) ; }
+        catch (...) {
+            cout << ROJO << "Numero invalido." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        string id = "galaxia-" + to_string(g) ;
+        if (Principal.getGalaxia(id).id == "") {
+            cout << ROJO << "Esa galaxia no existe." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        if (id == nuevoOrigen) {
+            cout << ROJO << "El destino no puede ser igual al origen." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        nuevoDestino = id ;
+        break ;
+    }
+
+    // tipo (texto, no puede quedar vacio porque vacio = cancelar).
+    while (true) {
+        cout << "tipo (actual: " << r->tipo << ") -> nuevo tipo: " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) {           // Enter vacio -> mantener el valor actual
+            break ;
+        }
+        nuevoTipo = entrada ;
+        break ;
+    }
+
+    // costo (float >= 0).
+    while (true) {
+        cout << "costo (actual: " << r->costo << ") -> nuevo costo: " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) {           // Enter vacio -> mantener el valor actual
+            break ;
+        }
+        float v ;
+        try { v = stof(entrada) ; }
+        catch (...) {
+            cout << ROJO << "Valor invalido." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        if (v < 0) {
+            cout << ROJO << "El costo debe ser >= 0." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        nuevoCosto = v ;
+        break ;
+    }
+
+    // tiempo_dias (float >= 0).
+    while (true) {
+        cout << "tiempo_dias (actual: " << r->tiempo_dias << ") -> nuevo tiempo: " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) {           // Enter vacio -> mantener el valor actual
+            break ;
+        }
+        float v ;
+        try { v = stof(entrada) ; }
+        catch (...) {
+            cout << ROJO << "Valor invalido." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        if (v < 0) {
+            cout << ROJO << "El tiempo debe ser >= 0." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        nuevoTiempo = v ;
+        break ;
+    }
+
+    // activa (s/n).
+    while (true) {
+        cout << "activa (actual: " << (r->activa ? "si" : "no") << ") -> (s/n): " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) {           // Enter vacio -> mantener el valor actual
+            break ;
+        }
+        if (entrada == "s" || entrada == "S" || entrada == "si" || entrada == "Si" || entrada == "SI") {
+            nuevaActiva = true ;
+            break ;
+        }
+        if (entrada == "n" || entrada == "N" || entrada == "no" || entrada == "No" || entrada == "NO") {
+            nuevaActiva = false ;
+            break ;
+        }
+        cout << ROJO << "Responda 's' (si) o 'n' (no)." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // Guardar los nuevos valores en la ruta (el id no cambia).
+    r->Editar(nuevoOrigen, nuevoDestino, nuevoTipo, nuevoCosto, nuevoTiempo, nuevaActiva) ;
+
+    // Cambiaron datos del grafo: reconstruir adyacencia y recalcular Kruskal.
+    Principal.crearListaAdyacencia() ;
+    k = kruskal(Principal) ;
+    k.crearListaAdyacencia() ;
+
+    cout << endl ;
+    cout << VERDE << "Ruta '" << r->id << "' actualizada correctamente:" << RESET << endl ;
+    r->print() ;
+    this_thread::sleep_for(chrono::seconds(2));
+
 
 }
 
 void smEliminarRuta() {
+    Ruta* r = nullptr ;
 
+    // Listar las rutas actuales y pedir cual eliminar (numero -> "ruta-N").
+    while (true) {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout << ITALICA << ROJO_CLARO << "---------- Eliminar Ruta ----------" << RESET << endl ;
+        cout << endl ;
+        Principal.printRutas() ;
+        cout << endl ;
+        cout <<AZUL_CLARO<< "Escriba el numero de la ruta que desea eliminar (0 para volver): "<<RESET ;
+
+        int o = leerOpcion() ;
+        if (o == 0) {
+            return ;
+        }
+        if (o < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+        string id = "ruta-" + to_string(o) ;
+        r = Principal.buscarRuta(id) ;
+        if (r == nullptr) {
+            cout << ROJO << "La ruta no existe." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // Mostrar la ruta seleccionada.
+    cout << endl ;
+    r->print() ;
+    cout << endl ;
+
+    // Guardar el id ANTES de borrar (luego el puntero queda colgando).
+    string id = r->id ;
+
+    // Confirmar. Cualquier respuesta distinta de "si" cancela.
+    cout << ROJO_CLARO << "Seguro que desea eliminar la ruta '" << id << "'? (si/no): " << RESET ;
+    string resp ;
+    getline(cin, resp) ;
+    if (!(resp == "si" || resp == "Si" || resp == "SI" || resp == "s" || resp == "S")) {
+        cout << AMARILLO << "Eliminacion cancelada." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+        return ;
+    }
+
+    // Eliminar la ruta del grafo principal.
+    Principal.eliminarRuta(id) ;
+
+    // Recalcular adyacencia del principal y el grafo optimizado (Kruskal).
+    Principal.crearListaAdyacencia() ;
+    k = kruskal(Principal) ;
+    k.crearListaAdyacencia() ;
+
+    cout << endl ;
+    cout << VERDE << "Ruta '" << id << "' eliminada con exito." << RESET << endl ;
+    this_thread::sleep_for(chrono::seconds(2));
 }
+
+
+
+void smverRutas() {
+    int o ;
+
+    do {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout << ITALICA << VERDE_CLARO << "---------- Ver Rutas ----------" << RESET << endl ;
+        cout << endl ;
+        Principal.printRutas() ;
+        cout << endl ;
+        cout << "Escriba el numero de la ruta a ver (0 para volver): " ;
+
+        o = leerOpcion() ;
+        if (o == 0) {
+            break ;
+        }
+        if (o < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+
+        string id = "ruta-" + to_string(o) ;
+        Ruta* r = Principal.buscarRuta(id) ;
+        if (r == nullptr) {
+            cout << ROJO << "La ruta no existe." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+
+        cout << endl ;
+        r->print() ;
+        this_thread::sleep_for(chrono::seconds(2));
+        break ;
+
+    } while (true) ;
+} ;
 
 void smenuRutas() {
     int o ;
@@ -693,13 +968,14 @@ void smenuRutas() {
         cout <<"1. Crear Ruta "<<endl ; 
         cout <<"2. Editar Ruta "<<endl ; 
         cout <<"3. Eliminar Ruta "<<endl ; 
+        cout <<"4. Ver Rutas "<<endl ; 
         cout <<"0. Volver "<<endl ;cout<<endl ;
         cout <<"Escriba una opcion : " ; 
 
         o= leerOpcion () ;
 
-        if (o < 0 || o > 3) {
-            cout << ROJO << "Solo opciones del 0 al 3.\n" << RESET;
+        if (o < 0 || o > 4) {
+            cout << ROJO << "Solo opciones del 0 al 4.\n" << RESET;
             this_thread::sleep_for(chrono::seconds(1));
             continue;
         }
@@ -721,6 +997,11 @@ void smenuRutas() {
                 smEliminarRuta() ;
                 continue;
                 
+            }
+            case 4  :{
+                smverRutas() ;
+                continue;
+
             }
 
         }
