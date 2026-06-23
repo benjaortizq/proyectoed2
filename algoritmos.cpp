@@ -204,8 +204,8 @@ void imprimirCamino (Grafo &g, const string &origen, const vector<Ruta> &camino)
 
         Galaxia desde = g.getGalaxia(actual);
         Galaxia hacia = g.getGalaxia(siguiente);
-        string nombreDesde = desde.nombre.empty() ? actual    : desde.nombre;
-        string nombreHacia = hacia.nombre.empty() ? siguiente : hacia.nombre;
+        string nombreDesde = desde.nombre.empty() ? actual    : desde.codigo;
+        string nombreHacia = hacia.nombre.empty() ? siguiente : hacia.codigo;
 
         cout << setw(20) << nombreDesde << setw(11) << r.id << setw(20) << nombreHacia
              << setw(14) << r.tipo << setw(10) << r.costo << setw(9) << r.tiempo_dias << endl;
