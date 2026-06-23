@@ -100,6 +100,7 @@ bool GenerarArchivoRutasMinimas () {
 // formato tabla, con todos sus datos. El nombre es:
 //   ArbolDeExpansion_<AnyoMesDia>_<cantidad de archivos ArbolDeExpansion_ ya existentes>.txt
 bool generarArchivoRutasExpansion (Grafo &g) {
+    
     string nombre = string(NOMBRE_ARCHIVO_EXPANSION) + fechaHoy() + "_" + to_string(archivosRUTASOPTIMIZADAS) + ".txt";
     string ruta = string(CARPETA_ARCHIVOS) + "/" + nombre;
 
