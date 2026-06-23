@@ -464,21 +464,91 @@ void menuReportes() {
 
 //!MENU CRUD ESTRUCTURAS -----------------------------------------------------
 
+
+//*--------------------------------------------------------------//--------------------------------------------------------------
+void smCrearGalaxia () { 
+
+}
+
+
+void smEditarGalaxia() {
+
+}
+
+void smEliminarGalaxia() {
+
+}
+
 void smenuGalaxias () {
+    int  o ;
     cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
     cout  <<ITALICA<<AMARILLO << "======== SubMenu de Galaxias ========"<<RESET<<endl ;
+    cout<<endl ;
+    cout <<"1. Crear Galaxia "<<endl ; 
+    cout <<"2. Editar Galaxia "<<endl ; 
+    cout <<"3. Eliminar Galaxia "<<endl ; 
     
 } ;
 
+
+//*--------------------------------------------------------------//--------------------------------------------------------------
+
+
+
+
+void smCrearRuta () { 
+
+}
+
+
+void smEditarRuta() {
+
+}
+
+void smEliminarRuta() {
+
+}
+
 void smenuRutas() {
+    int  o ;
     cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
     cout  <<ITALICA<<AMARILLO << "========== SubMenu de Rutas ========="<<RESET<<endl ;
+    cout<<endl ;
+    cout <<"1. Crear Ruta "<<endl ; 
+    cout <<"2. Editar Ruta "<<endl ; 
+    cout <<"3. Eliminar Ruta "<<endl ; 
 } ; 
 
 
+
+//*--------------------------------------------------------------//--------------------------------------------------------------
+
+void smCrearNaves() { 
+
+}
+
+
+void smEditarNaves() {
+
+}
+
+void smEliminarNaves() {
+
+}
+
+void smregistrarViaje() {
+
+}
+
 void smenuNaves(){
+    int  o ;
     cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
     cout  <<ITALICA<<AMARILLO << "======== SubMenu de Naves ========"<<RESET<<endl ;
+    cout<<endl ;
+    cout <<"1. Crear Nave "<<endl ; 
+    cout <<"2. Editar Nave "<<endl ; 
+    cout <<"3. Eliminar Nave "<<endl ; 
+    cout <<"4. Registrar Viaje "<<endl ; 
 } ; 
 
 
