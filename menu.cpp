@@ -484,11 +484,13 @@ void smenuGalaxias () {
 
     do  {
         cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
-        cout  <<ITALICA<<AMARILLO << "======== SubMenu de Galaxias ========"<<RESET<<endl ;
+        cout  <<ITALICA<<MAGENTA_CLARO << "--------- SubMenu de Galaxias --------"<<RESET<<endl ;
         cout<<endl ;
         cout <<"1. Crear Galaxia "<<endl ; 
         cout <<"2. Editar Galaxia "<<endl ; 
         cout <<"3. Eliminar Galaxia "<<endl ;
+        cout <<"0. Volver "<<endl ;cout<<endl ;
+        cout <<"Escriba una opcion : " ; 
         
         o= leerOpcion () ;
 
@@ -527,12 +529,153 @@ void smenuGalaxias () {
 
 
 
-void smCrearRuta () { 
+void smCrearRuta () {
+    // Variables de la nueva ruta.
+    string origen_id ;
+    string destino_id ;
+    string tipo ;
+    float  costo = 0.0f ;
+    float  tiempo_dias = 0.0f ;
+    bool   activa = false ;
 
+    // Titulo + tabla de galaxias disponibles para escoger origen/destino.
+    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+    cout << NEGRITA << VERDE_CLARO << "============ Crear Nueva Ruta ============" << RESET << endl ;
+    cout << endl ;
+    cout << CIAN << "--------------Galaxias disponibles--------------" << RESET << endl ;
+    cout << endl ;
+    Principal.printGalaxias() ;
+    cout << endl ;
+
+    // 1) Galaxia ORIGEN (se pide el numero y se arma el id "galaxia-N").
+    while (true) {
+        cout << "Escriba el numero de la galaxia ORIGEN (0 para cancelar): " ;
+        int g = leerOpcion() ;
+        if (g == 0) {
+            cout << AMARILLO << "Creacion de ruta cancelada." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            return ;
+        }
+        if (g < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+        string id = "galaxia-" + to_string(g) ;
+        if (Principal.getGalaxia(id).id == "") {
+            cout << ROJO << "Esa galaxia no existe. Intente de nuevo." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        origen_id = id ;
+        break ;
+    }
+
+    // 2) Galaxia DESTINO (debe existir y ser distinta del origen).
+    while (true) {
+        cout << "Escriba el numero de la galaxia DESTINO (0 para cancelar): " ;
+        int g = leerOpcion() ;
+        if (g == 0) {
+            cout << AMARILLO << "Creacion de ruta cancelada." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            return ;
+        }
+        if (g < 0) continue ;
+        string id = "galaxia-" + to_string(g) ;
+        if (Principal.getGalaxia(id).id == "") {
+            cout << ROJO << "Esa galaxia no existe. Intente de nuevo." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        if (id == origen_id) {
+            cout << ROJO << "El destino no puede ser igual al origen." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        destino_id = id ;
+        break ;
+    }
+
+    // 3) Tipo de ruta (texto, no puede quedar vacio).
+    while (true) {
+        cout << "Escriba el tipo de ruta (ej: comercial, militar): " ;
+        getline(cin, tipo) ;
+        if (tipo.empty()) {
+            cout << ROJO << "El tipo no puede quedar vacio." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // 4) Costo (float >= 0).
+    while (true) {
+        cout << "Escriba el costo de la ruta (>= 0): " ;
+        if (cin >> costo && costo >= 0) {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+            break ;
+        }
+        cin.clear() ;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+        cout << ROJO << "Costo invalido. Ingrese un numero >= 0." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // 5) Tiempo en dias (float >= 0).
+    while (true) {
+        cout << "Escriba el tiempo en dias (>= 0): " ;
+        if (cin >> tiempo_dias && tiempo_dias >= 0) {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+            break ;
+        }
+        cin.clear() ;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+        cout << ROJO << "Tiempo invalido. Ingrese un numero >= 0." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // 6) Activa? (si / no).
+    while (true) {
+        cout << "La ruta esta activa? (s/n): " ;
+        string resp ;
+        getline(cin, resp) ;
+        if (resp == "s" || resp == "S" || resp == "si" || resp == "Si" || resp == "SI") {
+            activa = true ;
+            break ;
+        }
+        if (resp == "n" || resp == "N" || resp == "no" || resp == "No" || resp == "NO") {
+            activa = false ;
+            break ;
+        }
+        cout << ROJO << "Responda 's' (si) o 'n' (no)." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // Generar un id unico para la ruta ("ruta-N" sin chocar con los existentes).
+    int n = (int)Principal.rutas.size() + 1 ;
+    string nuevoId = "ruta-" + to_string(n) ;
+    while (Principal.buscarRuta(nuevoId) != nullptr) {
+        n++ ;
+        nuevoId = "ruta-" + to_string(n) ;
+    }
+
+    // Crear el objeto Ruta y agregarlo al grafo principal.
+    Ruta nueva(nuevoId, origen_id, destino_id, tipo, costo, tiempo_dias, activa) ;
+    if (!Principal.agregarRuta(nueva)) {
+        cout << ROJO << "No se pudo crear la ruta (id repetido u origen/destino invalido)." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(2));
+        return ;
+    }
+
+    // agregarRuta ya reconstruye la lista de adyacencia del grafo principal;
+    // recalculamos el arbol de expansion minima (Kruskal) con la nueva ruta.
+    k = kruskal(Principal) ;
+    k.crearListaAdyacencia() ;
+
+    cout << endl ;
+    cout << VERDE << "Ruta '" << nuevoId << "' creada correctamente:" << RESET << endl ;
+    nueva.print() ;
+    this_thread::sleep_for(chrono::seconds(2));
 }
 
 
-void smEditarRuta() {
+void smEditarRuta() {   
 
 }
 
@@ -545,11 +688,13 @@ void smenuRutas() {
 
     do {
         cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
-        cout  <<ITALICA<<AMARILLO << "========== SubMenu de Rutas ========="<<RESET<<endl ;
+        cout  <<ITALICA<<VERDE_CLARO << "---------- SubMenu de Rutas ----------"<<RESET<<endl ;
         cout<<endl ;
         cout <<"1. Crear Ruta "<<endl ; 
         cout <<"2. Editar Ruta "<<endl ; 
         cout <<"3. Eliminar Ruta "<<endl ; 
+        cout <<"0. Volver "<<endl ;cout<<endl ;
+        cout <<"Escriba una opcion : " ; 
 
         o= leerOpcion () ;
 
@@ -609,12 +754,14 @@ void smenuNaves(){
 
     do  {
         cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
-        cout  <<ITALICA<<AMARILLO << "======== SubMenu de Naves ========"<<RESET<<endl ;
+        cout  <<ITALICA<<AZUL_CLARO << "-------- SubMenu de Naves --------"<<RESET<<endl ;
         cout<<endl ;
         cout <<"1. Crear Nave "<<endl ; 
         cout <<"2. Editar Nave "<<endl ; 
         cout <<"3. Eliminar Nave "<<endl ; 
         cout <<"4. Registrar Viaje "<<endl ; 
+        cout <<"0. Volver "<<endl ;cout<<endl ;
+        cout <<"Escriba una opcion : " ; 
 
         o= leerOpcion () ;
 
@@ -726,7 +873,8 @@ void menu () {
         cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
         cout <<NEGRITA<<MAJENTA<<"-----------SISTEMA DE MODELADO DE GALAXIAS-----------"<<RESET<<endl ; 
         cout<<endl ;
-        cout  << AZUL << "============ Menu principal ============"<<RESET<<endl ; 
+        cout<<endl ;
+        cout  <<NEGRITA<< AZUL_CLARO << "============"<<MAJENTA<<" Menu principal"<<AZUL_CLARO<<" ============"<<RESET<<endl ; 
         cout<<endl ;
         cout <<"1. Consultas "<<endl ; 
         cout <<"2. Reportes "<<endl ; 
