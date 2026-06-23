@@ -34,4 +34,25 @@ struct Nave {
         this->activa = activa ;
     }
 
+    // Reemplaza todos los datos de la nave (menos el id, que es su clave).
+    void Editar (string codigo , string nombre , int capacidad , int velocidad_Max , bool activa) {
+        this->codigo = codigo ;
+        this->nombre = nombre ;
+        this->capacidad = capacidad ;
+        this->velocidad_Max = velocidad_Max ;
+        this->activa = activa ;
+    }
+
+    void print () const {
+        cout << "Nave{" << endl;
+        cout << "  id: " << this->id << endl;
+        cout << "  codigo: " << this->codigo << endl;
+        cout << "  nombre: " << this->nombre << endl;
+        cout << "  capacidad: " << this->capacidad << endl;
+        cout << "  velocidad_Max: " << this->velocidad_Max << endl;
+        cout << "  activa: " << (this->activa ? "true" : "false") << endl;
+        cout << "  viajes: " << this->historial.size() << endl;
+        cout << "}" << endl;
+    }
+
 } ;

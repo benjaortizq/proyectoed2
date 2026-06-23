@@ -466,17 +466,349 @@ void menuReportes() {
 
 
 //*--------------------------------------------------------------//--------------------------------------------------------------
-void smCrearGalaxia () { 
+void smCrearGalaxia () {
+    // Variables de la nueva galaxia.
+    string codigo ;
+    string nombre ;
+    string tipo ;
+    string descripcion ;
+    float  x = 0.0f ;
+    float  y = 0.0f ;
+    float  z = 0.0f ;
 
+    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+    cout << NEGRITA << MAGENTA_CLARO << "============ Crear Nueva Galaxia ============" << RESET << endl ;
+    cout << endl ;
+
+    // 1) Codigo (texto, no puede quedar vacio y no puede repetirse).
+    while (true) {
+        cout << "Escriba el codigo de la galaxia: " ;
+        getline(cin, codigo) ;
+        if (codigo.empty()) {
+            cout << ROJO << "El codigo no puede quedar vacio." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        if (Principal.buscarGalaxiaPorCodigo(codigo) != nullptr) {
+            cout << ROJO << "Ya existe una galaxia con ese codigo." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // 2) Nombre (texto, no puede quedar vacio).
+    while (true) {
+        cout << "Escriba el nombre de la galaxia: " ;
+        getline(cin, nombre) ;
+        if (nombre.empty()) {
+            cout << ROJO << "El nombre no puede quedar vacio." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // 3) Tipo (texto, no puede quedar vacio).
+    while (true) {
+        cout << "Escriba el tipo de la galaxia (ej: espiral, eliptica): " ;
+        getline(cin, tipo) ;
+        if (tipo.empty()) {
+            cout << ROJO << "El tipo no puede quedar vacio." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // 4) Descripcion (texto, puede quedar vacio).
+    cout << "Escriba la descripcion de la galaxia (opcional): " ;
+    getline(cin, descripcion) ;
+
+    // 5) Coordenada X (cualquier numero, puede ser negativo).
+    while (true) {
+        cout << "Escriba la coordenada X: " ;
+        if (cin >> x) {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+            break ;
+        }
+        cin.clear() ;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+        cout << ROJO << "Valor invalido. Ingrese un numero." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // 6) Coordenada Y.
+    while (true) {
+        cout << "Escriba la coordenada Y: " ;
+        if (cin >> y) {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+            break ;
+        }
+        cin.clear() ;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+        cout << ROJO << "Valor invalido. Ingrese un numero." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // 7) Coordenada Z.
+    while (true) {
+        cout << "Escriba la coordenada Z: " ;
+        if (cin >> z) {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+            break ;
+        }
+        cin.clear() ;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+        cout << ROJO << "Valor invalido. Ingrese un numero." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // Generar un id unico ("galaxia-N" sin chocar con los existentes).
+    int n = (int)Principal.galaxias.size() + 1 ;
+    string nuevoId = "galaxia-" + to_string(n) ;
+    while (Principal.buscarGalaxia(nuevoId) != nullptr) {
+        n++ ;
+        nuevoId = "galaxia-" + to_string(n) ;
+    }
+
+    // Crear el objeto Galaxia y agregarlo al grafo principal.
+    Galaxia nueva(nuevoId, codigo, nombre, tipo, descripcion, x, y, z) ;
+    if (!Principal.agregarGalaxia(nueva)) {
+        cout << ROJO << "No se pudo crear la galaxia (id repetido)." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(2));
+        return ;
+    }
+
+    // Reconstruir la adyacencia y recalcular el arbol de expansion (Kruskal).
+    Principal.crearListaAdyacencia() ;
+    k = kruskal(Principal) ;
+    k.crearListaAdyacencia() ;
+
+    cout << endl ;
+    cout << VERDE << "Galaxia '" << nuevoId << "' creada correctamente:" << RESET << endl ;
+    nueva.print() ;
+    this_thread::sleep_for(chrono::seconds(2));
 }
 
 
 void smEditarGalaxia() {
+    Galaxia* g = nullptr ;
 
+    // Seleccionar la galaxia a editar: se listan y se pide el numero -> "galaxia-N".
+    while (true) {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout << ITALICA << MAGENTA_CLARO << "---------- Editar Galaxia ----------" << RESET << endl ;
+        cout << endl ;
+        Principal.printGalaxias() ;
+        cout << endl ;
+        cout << "Escriba el numero de la galaxia a editar (0 para volver): " ;
+
+        int o = leerOpcion() ;
+        if (o == 0) {
+            return ;
+        }
+        if (o < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+        string id = "galaxia-" + to_string(o) ;
+        g = Principal.buscarGalaxia(id) ;
+        if (g == nullptr) {                       // puntero vacio -> no existe
+            cout << ROJO << "La galaxia no existe." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // Mostrar la galaxia encontrada.
+    cout << endl ;
+    cout << VERDE << "Editando la siguiente galaxia:" << RESET << endl ;
+    g->print() ;
+    cout << endl ;
+    cout << AMARILLO << "Para cada campo escriba el nuevo valor. Enter VACIO mantiene el valor actual." << RESET << endl ;
+    cout << endl ;
+
+    // Variables para los nuevos valores (parten del valor actual).
+    string nuevoCodigo = g->codigo ;
+    string nuevoNombre = g->nombre ;
+    string nuevoTipo   = g->tipo ;
+    string nuevaDesc   = g->descripcion ;
+    float  nuevaX      = g->x ;
+    float  nuevaY      = g->y ;
+    float  nuevaZ      = g->z ;
+
+    string entrada ;
+
+    // codigo (debe ser unico entre las demas galaxias; vacio = mantener).
+    while (true) {
+        cout << "codigo (actual: " << g->codigo << ") -> nuevo codigo: " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) break ;           // mantener el valor actual
+        Galaxia* otra = Principal.buscarGalaxiaPorCodigo(entrada) ;
+        if (otra != nullptr && otra->id != g->id) {
+            cout << ROJO << "Ya existe otra galaxia con ese codigo." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        nuevoCodigo = entrada ;
+        break ;
+    }
+
+    // nombre.
+    cout << "nombre (actual: " << g->nombre << ") -> nuevo nombre: " ;
+    getline(cin, entrada) ;
+    if (!entrada.empty()) nuevoNombre = entrada ;
+
+    // tipo.
+    cout << "tipo (actual: " << g->tipo << ") -> nuevo tipo: " ;
+    getline(cin, entrada) ;
+    if (!entrada.empty()) nuevoTipo = entrada ;
+
+    // descripcion.
+    cout << "descripcion (actual: " << g->descripcion << ") -> nueva descripcion: " ;
+    getline(cin, entrada) ;
+    if (!entrada.empty()) nuevaDesc = entrada ;
+
+    // x (numero, vacio = mantener).
+    while (true) {
+        cout << "x (actual: " << g->x << ") -> nueva x: " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) break ;           // mantener el valor actual
+        try { nuevaX = stof(entrada) ; break ; }
+        catch (...) {
+            cout << ROJO << "Valor invalido." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+        }
+    }
+
+    // y.
+    while (true) {
+        cout << "y (actual: " << g->y << ") -> nueva y: " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) break ;
+        try { nuevaY = stof(entrada) ; break ; }
+        catch (...) {
+            cout << ROJO << "Valor invalido." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+        }
+    }
+
+    // z.
+    while (true) {
+        cout << "z (actual: " << g->z << ") -> nueva z: " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) break ;
+        try { nuevaZ = stof(entrada) ; break ; }
+        catch (...) {
+            cout << ROJO << "Valor invalido." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+        }
+    }
+
+    // Guardar los nuevos valores (el id no cambia).
+    g->Editar(nuevoCodigo, nuevoNombre, nuevoTipo, nuevaDesc, nuevaX, nuevaY, nuevaZ) ;
+
+    // Cambiaron datos del grafo: reconstruir adyacencia y recalcular Kruskal.
+    Principal.crearListaAdyacencia() ;
+    k = kruskal(Principal) ;
+    k.crearListaAdyacencia() ;
+
+    cout << endl ;
+    cout << VERDE << "Galaxia '" << g->id << "' actualizada correctamente:" << RESET << endl ;
+    g->print() ;
+    this_thread::sleep_for(chrono::seconds(2));
 }
 
 void smEliminarGalaxia() {
+    Galaxia* g = nullptr ;
 
+    // Listar las galaxias y pedir cual eliminar (numero -> "galaxia-N").
+    while (true) {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout << ITALICA << ROJO_CLARO << "---------- Eliminar Galaxia ----------" << RESET << endl ;
+        cout << endl ;
+        Principal.printGalaxias() ;
+        cout << endl ;
+        cout << "Escriba el numero de la galaxia que desea eliminar (0 para volver): " ;
+
+        int o = leerOpcion() ;
+        if (o == 0) {
+            return ;
+        }
+        if (o < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+        string id = "galaxia-" + to_string(o) ;
+        g = Principal.buscarGalaxia(id) ;
+        if (g == nullptr) {
+            cout << ROJO << "La galaxia no existe." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // Mostrar la galaxia seleccionada.
+    cout << endl ;
+    g->print() ;
+    cout << endl ;
+
+    // Guardar el id ANTES de borrar (luego el puntero queda colgando).
+    string id = g->id ;
+
+    // Avisar que tambien se borran sus rutas y confirmar.
+    cout << ROJO_CLARO << "Al eliminar la galaxia '" << id
+         << "' tambien se borraran TODAS sus rutas conectadas." << RESET << endl ;
+    cout << ROJO_CLARO << "Seguro que desea eliminarla? (si/no): " << RESET ;
+    string resp ;
+    getline(cin, resp) ;
+    if (!(resp == "si" || resp == "Si" || resp == "SI" || resp == "s" || resp == "S")) {
+        cout << AMARILLO << "Eliminacion cancelada." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+        return ;
+    }
+
+    // Eliminar la galaxia (y sus rutas) del grafo principal.
+    Principal.eliminarGalaxia(id) ;
+
+    // Recalcular adyacencia del principal y el grafo optimizado (Kruskal).
+    Principal.crearListaAdyacencia() ;
+    k = kruskal(Principal) ;
+    k.crearListaAdyacencia() ;
+
+    cout << endl ;
+    cout << VERDE << "Galaxia '" << id << "' eliminada con exito." << RESET << endl ;
+    this_thread::sleep_for(chrono::seconds(2));
+}
+
+void smVerGalaxias () {
+    int o ;
+
+    do {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout << ITALICA << MAGENTA_CLARO << "---------- Ver Galaxias ----------" << RESET << endl ;
+        cout << endl ;
+        Principal.printGalaxias() ;
+        cout << endl ;
+        cout << "Escriba el numero de la galaxia a ver (0 para volver): " ;
+
+        o = leerOpcion() ;
+        if (o == 0) {
+            break ;
+        }
+        if (o < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+
+        string id = "galaxia-" + to_string(o) ;
+        Galaxia* g = Principal.buscarGalaxia(id) ;
+        if (g == nullptr) {
+            cout << ROJO << "La galaxia no existe." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+
+        cout << endl ;
+        g->print() ;
+        this_thread::sleep_for(chrono::seconds(2));
+        break ;
+
+    } while (true) ;
 }
 
 void smenuGalaxias () {
@@ -486,17 +818,18 @@ void smenuGalaxias () {
         cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
         cout  <<ITALICA<<MAGENTA_CLARO << "--------- SubMenu de Galaxias --------"<<RESET<<endl ;
         cout<<endl ;
-        cout <<"1. Crear Galaxia "<<endl ; 
-        cout <<"2. Editar Galaxia "<<endl ; 
+        cout <<"1. Crear Galaxia "<<endl ;
+        cout <<"2. Editar Galaxia "<<endl ;
         cout <<"3. Eliminar Galaxia "<<endl ;
+        cout <<"4. Ver Galaxias "<<endl ;
         cout <<"0. Volver "<<endl ;cout<<endl ;
-        cout <<"Escriba una opcion : " ; 
-        
+        cout <<"Escriba una opcion : " ;
+
         o= leerOpcion () ;
 
 
-        if (o < 0 || o > 3) {
-            cout << ROJO << "Solo opciones del 0 al 3.\n" << RESET;
+        if (o < 0 || o > 4) {
+            cout << ROJO << "Solo opciones del 0 al 4.\n" << RESET;
             this_thread::sleep_for(chrono::seconds(1));
             continue;
         }
@@ -505,16 +838,21 @@ void smenuGalaxias () {
 
             case 1 : { 
                 smCrearGalaxia() ;
-
+                continue;
             }
             case 2 :{ 
                 smEditarGalaxia() ;
-
+                continue;
             }
 
             case 3 : {
                 smEliminarGalaxia() ;
-                
+                continue;
+            }
+
+            case 4 :  { 
+                smVerGalaxias () ; 
+                continue;
             }
 
         }
@@ -701,6 +1039,11 @@ void smEditarRuta() {
         }
         break ;
     }
+
+    cout << endl ;
+    cout << CIAN << "--------------Galaxias disponibles--------------" << RESET << endl ;
+    cout << endl ;
+    Principal.printGalaxias() ;
 
     // Mostrar la ruta encontrada con formato claro.
     cout << endl ;
@@ -1013,21 +1356,320 @@ void smenuRutas() {
 
 //*--------------------------------------------------------------//--------------------------------------------------------------
 
-void smCrearNaves() { 
+void smCrearNaves() {
+    // Variables de la nueva nave.
+    string codigo ;
+    string nombre ;
+    int    capacidad = 0 ;
+    int    velocidad_Max = 0 ;
+    bool   activa = false ;
 
+    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+    cout << NEGRITA << AZUL_CLARO << "============ Crear Nueva Nave ============" << RESET << endl ;
+    cout << endl ;
+
+    // 1) Codigo (texto, no puede quedar vacio).
+    while (true) {
+        cout << "Escriba el codigo de la nave: " ;
+        getline(cin, codigo) ;
+        if (codigo.empty()) {
+            cout << ROJO << "El codigo no puede quedar vacio." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // 2) Nombre (texto, no puede quedar vacio).
+    while (true) {
+        cout << "Escriba el nombre de la nave: " ;
+        getline(cin, nombre) ;
+        if (nombre.empty()) {
+            cout << ROJO << "El nombre no puede quedar vacio." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // 3) Capacidad (entero >= 0).
+    while (true) {
+        cout << "Escriba la capacidad de la nave (>= 0): " ;
+        if (cin >> capacidad && capacidad >= 0) {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+            break ;
+        }
+        cin.clear() ;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+        cout << ROJO << "Capacidad invalida. Ingrese un entero >= 0." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // 4) Velocidad maxima (entero >= 0).
+    while (true) {
+        cout << "Escriba la velocidad maxima de la nave (>= 0): " ;
+        if (cin >> velocidad_Max && velocidad_Max >= 0) {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+            break ;
+        }
+        cin.clear() ;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+        cout << ROJO << "Velocidad invalida. Ingrese un entero >= 0." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // 5) Activa? (si / no).
+    while (true) {
+        cout << "La nave esta activa? (s/n): " ;
+        string resp ;
+        getline(cin, resp) ;
+        if (resp == "s" || resp == "S" || resp == "si" || resp == "Si" || resp == "SI") {
+            activa = true ;
+            break ;
+        }
+        if (resp == "n" || resp == "N" || resp == "no" || resp == "No" || resp == "NO") {
+            activa = false ;
+            break ;
+        }
+        cout << ROJO << "Responda 's' (si) o 'n' (no)." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // Generar un id unico ("nave-N" sin chocar con las existentes).
+    int n = (int)naves.size() + 1 ;
+    string nuevoId = "nave-" + to_string(n) ;
+    while (buscarNave(naves, nuevoId).id != "") {
+        n++ ;
+        nuevoId = "nave-" + to_string(n) ;
+    }
+
+    // Crear la nave y agregarla al vector global de naves.
+    Nave nueva(nuevoId, codigo, nombre, capacidad, velocidad_Max, activa) ;
+    naves.push_back(nueva) ;
+
+    cout << endl ;
+    cout << VERDE << "Nave '" << nuevoId << "' creada correctamente:" << RESET << endl ;
+    nueva.print() ;
+    this_thread::sleep_for(chrono::seconds(2));
 }
 
 
 void smEditarNaves() {
+    Nave* nv = nullptr ;
 
+    // Seleccionar la nave a editar: se listan y se pide el numero -> "nave-N".
+    while (true) {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout << ITALICA << AZUL_CLARO << "---------- Editar Nave ----------" << RESET << endl ;
+        cout << endl ;
+        imprimirNaves(naves) ;
+        cout << endl ;
+        cout << "Escriba el numero de la nave a editar (0 para volver): " ;
+
+        int o = leerOpcion() ;
+        if (o == 0) {
+            return ;
+        }
+        if (o < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+        string id = "nave-" + to_string(o) ;
+        for (Nave &n : naves) {            // buscar la referencia real en el vector
+            if (n.id == id) { nv = &n ; break ; }
+        }
+        if (nv == nullptr) {
+            cout << ROJO << "La nave no existe." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // Mostrar la nave encontrada.
+    cout << endl ;
+    cout << VERDE << "Editando la siguiente nave:" << RESET << endl ;
+    nv->print() ;
+    cout << endl ;
+    cout << AMARILLO << "Para cada campo escriba el nuevo valor. Enter VACIO mantiene el valor actual." << RESET << endl ;
+    cout << endl ;
+
+    // Variables para los nuevos valores (parten del valor actual).
+    string nuevoCodigo    = nv->codigo ;
+    string nuevoNombre    = nv->nombre ;
+    int    nuevaCapacidad = nv->capacidad ;
+    int    nuevaVelocidad = nv->velocidad_Max ;
+    bool   nuevaActiva    = nv->activa ;
+
+    string entrada ;
+
+    // codigo.
+    cout << "codigo (actual: " << nv->codigo << ") -> nuevo codigo: " ;
+    getline(cin, entrada) ;
+    if (!entrada.empty()) nuevoCodigo = entrada ;
+
+    // nombre.
+    cout << "nombre (actual: " << nv->nombre << ") -> nuevo nombre: " ;
+    getline(cin, entrada) ;
+    if (!entrada.empty()) nuevoNombre = entrada ;
+
+    // capacidad (entero >= 0, vacio = mantener).
+    while (true) {
+        cout << "capacidad (actual: " << nv->capacidad << ") -> nueva capacidad: " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) break ;           // mantener el valor actual
+        int v ;
+        try { v = stoi(entrada) ; }
+        catch (...) {
+            cout << ROJO << "Valor invalido." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        if (v < 0) {
+            cout << ROJO << "La capacidad debe ser >= 0." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        nuevaCapacidad = v ;
+        break ;
+    }
+
+    // velocidad_Max (entero >= 0, vacio = mantener).
+    while (true) {
+        cout << "velocidad_Max (actual: " << nv->velocidad_Max << ") -> nueva velocidad: " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) break ;
+        int v ;
+        try { v = stoi(entrada) ; }
+        catch (...) {
+            cout << ROJO << "Valor invalido." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        if (v < 0) {
+            cout << ROJO << "La velocidad debe ser >= 0." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        nuevaVelocidad = v ;
+        break ;
+    }
+
+    // activa (s/n, vacio = mantener).
+    while (true) {
+        cout << "activa (actual: " << (nv->activa ? "si" : "no") << ") -> (s/n): " ;
+        getline(cin, entrada) ;
+        if (entrada.empty()) break ;           // mantener el valor actual
+        if (entrada == "s" || entrada == "S" || entrada == "si" || entrada == "Si" || entrada == "SI") {
+            nuevaActiva = true ;
+            break ;
+        }
+        if (entrada == "n" || entrada == "N" || entrada == "no" || entrada == "No" || entrada == "NO") {
+            nuevaActiva = false ;
+            break ;
+        }
+        cout << ROJO << "Responda 's' (si) o 'n' (no)." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // Guardar los nuevos valores en la nave (el id no cambia).
+    nv->Editar(nuevoCodigo, nuevoNombre, nuevaCapacidad, nuevaVelocidad, nuevaActiva) ;
+
+    cout << endl ;
+    cout << VERDE << "Nave '" << nv->id << "' actualizada correctamente:" << RESET << endl ;
+    nv->print() ;
+    this_thread::sleep_for(chrono::seconds(2));
 }
 
 void smEliminarNaves() {
+    string id ;
 
+    // Listar las naves y pedir cual eliminar (numero -> "nave-N").
+    while (true) {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout << ITALICA << ROJO_CLARO << "---------- Eliminar Nave ----------" << RESET << endl ;
+        cout << endl ;
+        imprimirNaves(naves) ;
+        cout << endl ;
+        cout << "Escriba el numero de la nave que desea eliminar (0 para volver): " ;
+
+        int o = leerOpcion() ;
+        if (o == 0) {
+            return ;
+        }
+        if (o < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+        id = "nave-" + to_string(o) ;
+        if (buscarNave(naves, id).id == "") {     // no existe ninguna nave con ese id
+            cout << ROJO << "La nave no existe." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // Mostrar la nave seleccionada (buscandola por id, no por posicion).
+    cout << endl ;
+    buscarNave(naves, id).print() ;
+    cout << endl ;
+
+    // Confirmar. Cualquier respuesta distinta de "si" cancela.
+    cout << ROJO_CLARO << "Seguro que desea eliminar la nave '" << id << "'? (si/no): " << RESET ;
+    string resp ;
+    getline(cin, resp) ;
+    if (!(resp == "si" || resp == "Si" || resp == "SI" || resp == "s" || resp == "S")) {
+        cout << AMARILLO << "Eliminacion cancelada." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+        return ;
+    }
+
+    // Eliminar la nave buscandola por su id (no por indice/offset).
+    for (auto it = naves.begin(); it != naves.end(); ++it) {
+        if (it->id == id) {
+            naves.erase(it) ;
+            break ;
+        }
+    }
+
+    cout << endl ;
+    cout << VERDE << "Nave '" << id << "' eliminada con exito." << RESET << endl ;
+    this_thread::sleep_for(chrono::seconds(2));
 }
 
 void smregistrarViaje() {
 
+}
+
+void smVerNaves () {
+    int o ;
+
+    do {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout << ITALICA << AZUL_CLARO << "---------- Ver Naves ----------" << RESET << endl ;
+        cout << endl ;
+        imprimirNaves(naves) ;
+        cout << endl ;
+        cout << "Escriba el numero de la nave a ver (0 para volver): " ;
+
+        o = leerOpcion() ;
+        if (o == 0) {
+            break ;
+        }
+        if (o < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+
+        string id = "nave-" + to_string(o) ;
+        Nave* nv = nullptr ;
+        for (Nave &n : naves) {
+            if (n.id == id) { nv = &n ; break ; }
+        }
+        if (nv == nullptr) {
+            cout << ROJO << "La nave no existe." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+
+        cout << endl ;
+        nv->print() ;
+        this_thread::sleep_for(chrono::seconds(2));
+        break ;
+
+    } while (true) ;
 }
 
 void smenuNaves(){
@@ -1040,38 +1682,45 @@ void smenuNaves(){
         cout <<"1. Crear Nave "<<endl ; 
         cout <<"2. Editar Nave "<<endl ; 
         cout <<"3. Eliminar Nave "<<endl ; 
-        cout <<"4. Registrar Viaje "<<endl ; 
+        cout <<"4. Ver Naves "<<endl ; cout<<endl ;
+        cout <<"5. Registrar Viaje "<<endl ; 
         cout <<"0. Volver "<<endl ;cout<<endl ;
         cout <<"Escriba una opcion : " ; 
 
         o= leerOpcion () ;
 
-        if (o < 0 || o > 4) {
-            cout << ROJO << "Solo opciones del 0 al 4.\n" << RESET;
+        if (o < 0 || o > 5) {
+            cout << ROJO << "Solo opciones del 0 al 5.\n" << RESET;
             this_thread::sleep_for(chrono::seconds(1));
             continue;
         }
 
-        switch  (o) { 
+        switch  (o) {
 
-            case 1 : { 
+            case 1 : {
                 smCrearNaves () ;
                 continue;
 
             }
-            case 2 :{ 
+            case 2 :{
                 smEditarNaves () ;
                 continue;
 
             }
 
             case 3 : {
-                smEditarNaves () ;
+                smEliminarNaves () ;
                 continue;
-                
+
             }
 
-            case 4 : {
+            case 4 : { 
+                smVerNaves () ; 
+                continue;
+
+            }
+
+            case 5 : {
                 smregistrarViaje () ; 
                 continue;
             }

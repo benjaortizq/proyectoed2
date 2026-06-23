@@ -199,6 +199,15 @@ struct Grafo {
         return nullptr;
     }
 
+    // Devuelve un puntero a la galaxia con ese codigo, o nullptr si no existe.
+    // Sirve para validar que el codigo no se repita entre galaxias.
+    Galaxia* buscarGalaxiaPorCodigo (const string &codigo) {
+        for (Galaxia &gal : this->galaxias) {
+            if (gal.codigo == codigo) return &gal;
+        }
+        return nullptr;
+    }
+
     // Devuelve un puntero a la ruta con ese id, o nullptr si no existe.
     Ruta* buscarRuta (const string &id) {
         for (Ruta &r : this->rutas) {
