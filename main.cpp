@@ -1,6 +1,7 @@
 #include "menu.cpp"
 
-int main () {
+
+void cargardatos() { 
     cout<<endl ;
     cout<<endl ;
     cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
@@ -8,14 +9,6 @@ int main () {
     this_thread::sleep_for(chrono::milliseconds(500));
     cout << "~~~~~~~~~~~~~~ Benjamin Ortiz Quispe - 2025064599 ~~~~~~~~~~~~"<<endl ;
     this_thread::sleep_for(chrono::milliseconds(500));
-
-    //!PRECARGA DE DATOS 
-
-    SetTraceLogLevel(LOG_WARNING);
-
-    //algorimos inicialews
-
-    
     obtenerGrafoKurskal (Principal) ;
     rellenarDatosGrafo (Principal);
     obtenerNaves () ;
@@ -24,8 +17,12 @@ int main () {
     Principal.crearListaAdyacencia() ;
     archivosRUTASMINIMAS= contarArchivosConPrefijo(NOMBRE_ARCHIVO_RUTAS) ;
 
-    
 
+}
+
+int main () {
+    SetTraceLogLevel(LOG_WARNING);
+    cargardatos() ;
     menu() ;
 
 }
