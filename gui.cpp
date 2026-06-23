@@ -78,7 +78,7 @@ void dibujarGrafo (const Grafo &g, const vector<Ruta> &resaltadas) {
         for (const Galaxia &gal : g.galaxias) {
             Vector2 p = pos[gal.id];
             DrawCircleV(p, 9, SKYBLUE);
-            DrawText(gal.nombre.c_str(), (int)p.x + 11, (int)p.y - 6, 12, RAYWHITE);
+            DrawText(gal.codigo.c_str(), (int)p.x + 11, (int)p.y - 6, 12, RAYWHITE);
         }
 
         // c. Informacion general.
@@ -186,7 +186,7 @@ void GraficarARBOL (const Grafo &arbol) {
             if (!pos.count(gal.id)) continue;
             Vector2 p = pos[gal.id];
             DrawCircleV(p, 10, SKYBLUE);
-            const string &etiqueta = gal.nombre.empty() ? gal.id : gal.nombre;
+            const string &etiqueta = gal.nombre.empty() ? gal.codigo : gal.codigo;
             DrawText(etiqueta.c_str(), (int)p.x + 12, (int)p.y - 6, 12, RAYWHITE);
         }
 

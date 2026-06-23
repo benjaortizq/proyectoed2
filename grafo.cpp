@@ -52,23 +52,21 @@ struct Grafo {
     }
 
 
-    // ===================== IMPRESION EN TABLA =====================
-
-    // Imprime todas las galaxias en formato tabla (parametros simplificados).
     void printGalaxias () {
         cout << left;
         cout << setw(13) << "ID" << setw(13) << "CODIGO"
-             << setw(26) << "NOMBRE" << setw(14) << "TIPO" << endl;
-        cout << string(66, '-') << endl;
+             << setw(26) << "NOMBRE" << setw(14) << "TIPO"
+             << setw(10) << "X" << setw(10) << "Y" << setw(10) << "Z" << endl;
+        cout << string(96, '-') << endl;
 
         for (const Galaxia &g : this->galaxias) {
             cout << setw(13) << g.id << setw(13) << g.codigo
-                 << setw(26) << g.nombre << setw(14) << g.tipo << endl;
+                 << setw(26) << g.nombre << setw(14) << g.tipo
+                 << setw(10) << g.x << setw(10) << g.y << setw(10) << g.z << endl;
         }
         cout << "Total: " << this->galaxias.size() << " galaxias" << endl;
     }
 
-    // Imprime todas las rutas en formato tabla (parametros simplificados).
     void printRutas () {
         cout << left;
         cout << setw(11) << "ID" << setw(13) << "ORIGEN" << setw(13) << "DESTINO"
@@ -83,9 +81,6 @@ struct Grafo {
         }
         cout << "Total: " << this->rutas.size() << " rutas" << endl;
     }
-
-    // Imprime en formato tabla las rutas que salen de una galaxia dada.
-    // (No dirigido: se muestra el OTRO extremo de cada ruta como destino.)
     void imprimirAdyacencia (Galaxia gal) {
         cout << "Rutas desde " << gal.id;
         if (!gal.nombre.empty()) cout << " (" << gal.nombre << ")";
@@ -93,7 +88,7 @@ struct Grafo {
 
         cout << left;
         cout << setw(11) << "RUTA" << setw(13) << "DESTINO" << setw(14) << "TIPO"
-             << setw(10) << "COSTO" << setw(9) << "TIEMPO" << endl;
+             << setw(10) << "COSTO" << setw(9) << "TIEMPO" << setw(7) << "ACTIVA" << endl;
         cout << string(57, '-') << endl;
 
         bool alguna = false;
@@ -101,7 +96,7 @@ struct Grafo {
             if (r.origen_id == gal.id || r.destino_id == gal.id) {
                 string destino = (r.origen_id == gal.id) ? r.destino_id : r.origen_id;
                 cout << setw(11) << r.id << setw(13) << destino << setw(14) << r.tipo
-                     << setw(10) << r.costo << setw(9) << r.tiempo_dias << endl;
+                     << setw(10) << r.costo << setw(9) << r.tiempo_dias << setw(7)<<((r.activa)?"SI":"NO")<<endl;
                 alguna = true;
             }
         }

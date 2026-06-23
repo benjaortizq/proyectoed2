@@ -3,8 +3,8 @@
 
 void cargardatos() { 
     cout<<endl ;
-    cout<<endl ;
-    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
     cout <<CIAN<<"-------------------II PROYECTO ESTRUCTURAS DE DATOS -------------------"<<RESET<<endl ; 
     this_thread::sleep_for(chrono::milliseconds(500));
     cout << "~~~~~~~~~~~~~~ Benjamin Ortiz Quispe - 2025064599 ~~~~~~~~~~~~"<<endl ;
@@ -25,6 +25,10 @@ void cargardatos() {
 
     archivosRUTASMINIMAS= contarArchivosConPrefijo(NOMBRE_ARCHIVO_RUTAS) ;
     archivosRUTASOPTIMIZADAS = contarArchivosConPrefijo(NOMBRE_ARCHIVO_EXPANSION);
+
+
+
+    cout<<endl ;cout<<endl ;cout<<endl ;
     
 
 
@@ -33,6 +37,7 @@ void cargardatos() {
 int main () {
     SetTraceLogLevel(LOG_WARNING);
     cargardatos() ;
+    
     
 
     menu() ;

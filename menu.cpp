@@ -167,6 +167,7 @@ void rutamascortaentreGalaxias() {
     int g1 ;
     int g2 ;
     do {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
         cout  << CIAN << "--------------Lista de todas las Galaxias--------------"<<RESET<<endl ;
         cout<<endl ;
         Principal.printGalaxias() ;
@@ -217,7 +218,7 @@ void rutamascortaentreGalaxias() {
         cout<<"Ruta en el grafo Principal: " <<endl ;
         imprimirCamino (Principal , id1 , camino) ;
         cout<<endl ;
-        cout<<"Ruta en el grafo Optimizado : " <<endl ;
+        cout<<"Ruta en el grafo  'Optimizado' : " <<endl ;
         imprimirCamino (k , id1 , caminoK) ;        // <- ahora el camino de Kruskal
         cout<<endl ;
 
@@ -234,6 +235,7 @@ void rutamascortaentreGalaxias() {
 void MenuConsultasRutasdesdeGalaxia () { 
     int o ;
     do  {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
 
         cout  << CIAN << "--------------Lista de todas las Galaxias--------------"<<RESET<<endl ;
         cout<<endl ;
@@ -269,6 +271,7 @@ void historialdeViajes() {
     int o ; 
 
     do {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
         cout  << CIAN << "----------------Lista de todas las Naves---------------"<<RESET<<endl ;
         cout<<endl ;
         imprimirNaves (naves);
@@ -301,10 +304,10 @@ void historialdeViajes() {
 
 void menuConsultas() { 
     int  o;
-
     do {
-        cout<<endl ;cout<<endl ;cout<<endl ;
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
         cout  << CIAN << "========= Menu de Consultas ========="<<RESET<<endl ;
+        cout<<endl ;
         cout <<"1. Rutas desde una Galaxia "<<endl ; 
         cout <<"2. Ruta de menor costo entre dos Galaxias "<<endl ; 
         cout <<"3. Arbol de conexiones  "<<endl ; 
@@ -411,8 +414,9 @@ void menuReportes() {
     int o ;
 
     do {
-        cout<<endl ;cout<<endl ;cout<<endl ;
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
         cout  << VERDE_CLARO << "========= Menu de Reportes ========="<<RESET<<endl ;
+        cout<<endl ;
         cout <<"1. Generar Archivo con las rutas mas cortas generadas "<<endl ; 
         cout <<"2. Generar Archivo de Arbol de Expansion "<<endl ; 
         cout <<"3. Generar Archivo de Estadisticas "<<endl ; 
@@ -458,6 +462,25 @@ void menuReportes() {
 
 
 
+//!MENU CRUD ESTRUCTURAS -----------------------------------------------------
+
+void smenuGalaxias () {
+    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+    cout  <<ITALICA<<AMARILLO << "======== SubMenu de Galaxias ========"<<RESET<<endl ;
+    
+} ;
+
+void smenuRutas() {
+    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+    cout  <<ITALICA<<AMARILLO << "========== SubMenu de Rutas ========="<<RESET<<endl ;
+} ; 
+
+
+void smenuNaves(){
+    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+    cout  <<ITALICA<<AMARILLO << "======== SubMenu de Naves ========"<<RESET<<endl ;
+} ; 
+
 
 
 
@@ -467,8 +490,9 @@ void menuReportes() {
 void menuGrafo() { 
     int o ;
     do {
-        cout<<endl ;cout<<endl ;cout<<endl ;
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
         cout  << AMARILLO << "========= Menu de Grafo ========="<<RESET<<endl ;
+        cout<<endl ;
         cout <<"1. Opciones de Galaxias "<<endl ; 
         cout <<"2. Opciones de Rutas"<<endl ; 
         cout <<"3. Opciones de Naves"<<endl ;
@@ -480,6 +504,29 @@ void menuGrafo() {
             cout << ROJO << "Solo opciones del 0 al 3.\n" << RESET;
             this_thread::sleep_for(chrono::seconds(1));
             continue;
+        }
+
+        switch ( o)
+        {
+            case 1 :{ 
+                smenuGalaxias() ;
+                continue;
+
+            }
+
+            case 2 : {
+                smenuRutas() ;
+                continue;
+                
+            }
+
+            case 3 : {
+                smenuNaves() ;
+                continue;
+
+            }
+
+        
         }
     }
     while (o!=0) ;
@@ -504,9 +551,11 @@ void menu () {
 
     int o; 
     do {
-        cout<<endl ;cout<<endl ;cout<<endl ;
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
         cout <<NEGRITA<<MAJENTA<<"-----------SISTEMA DE MODELADO DE GALAXIAS-----------"<<RESET<<endl ; 
+        cout<<endl ;
         cout  << AZUL << "============ Menu principal ============"<<RESET<<endl ; 
+        cout<<endl ;
         cout <<"1. Consultas "<<endl ; 
         cout <<"2. Reportes "<<endl ; 
         cout <<"3. Grafo "<<endl ; 
