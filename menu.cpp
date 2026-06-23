@@ -1633,7 +1633,195 @@ void smEliminarNaves() {
 }
 
 void smregistrarViaje() {
+    // Datos del viaje a registrar.
+    string nave_id ;          // id de la nave escogida
+    string ruta_id ;          // id de la ruta escogida
+    string fecha ;            // fecha del viaje
+    float  costo_real = 0.0f ;
+    bool   exitoso = false ;
+    string nave_nombre ;      // nombre de la nave escogida
+    string origen_nombre ;    // nombre de la galaxia origen
+    string destino_nombre ;   // nombre de la galaxia destino
 
+    // ===================== 1) ESCOGER NAVE =====================
+    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+    cout << NEGRITA << VERDE_CLARO << "============ Registrar Viaje ============" << RESET << endl ;
+    cout << endl ;
+    cout << CIAN << "--------------Naves disponibles--------------" << RESET << endl ;
+    cout << endl ;
+    imprimirNaves(naves) ;
+    cout << endl ;
+
+    while (true) {
+        cout << "Escriba el numero de la nave (0 para cancelar): " ;
+        int o = leerOpcion() ;
+        if (o == 0) {
+            cout << AMARILLO << "Registro de viaje cancelado." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            return ;
+        }
+        if (o < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+        string id = "nave-" + to_string(o) ;
+        Nave nv = buscarNave(naves, id) ;
+        if (nv.id == "") {
+            cout << ROJO << "Esa nave no existe. Intente de nuevo." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        nave_id = nv.id ;
+        nave_nombre = nv.nombre ;
+        break ;
+    }
+
+    // ===================== 2) ESCOGER GALAXIA ORIGEN =====================
+    string origen_id ;
+    cout << endl ;
+    cout << CIAN << "--------------Galaxias disponibles--------------" << RESET << endl ;
+    cout << endl ;
+    Principal.printGalaxias() ;
+    cout << endl ;
+
+    while (true) {
+        cout << "Escriba el numero de la galaxia ORIGEN (0 para cancelar): " ;
+        int g = leerOpcion() ;
+        if (g == 0) {
+            cout << AMARILLO << "Registro de viaje cancelado." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            return ;
+        }
+        if (g < 0) continue ;
+        string id = "galaxia-" + to_string(g) ;
+        Galaxia gal = Principal.getGalaxia(id) ;
+        if (gal.id == "") {
+            cout << ROJO << "Esa galaxia no existe. Intente de nuevo." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        origen_id = gal.id ;
+        origen_nombre = gal.nombre ;
+        break ;
+    }
+
+    // ===================== 3) MOSTRAR RUTAS DE ESA GALAXIA =====================
+    Galaxia gOrigen = Principal.getGalaxia(origen_id) ;
+
+    // Rutas disponibles para escoger (las del grafo principal que tocan el origen).
+    vector<Ruta> rutasDisponibles = Principal.rutasDesdeGalaxia(origen_id) ;
+    if (rutasDisponibles.empty()) {
+        cout << endl ;
+        cout << ROJO << "La galaxia '" << origen_id << "' no tiene rutas. No se puede registrar el viaje." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(2));
+        return ;
+    }
+
+    cout << endl ;
+    cout << CIAN << "----------- Grafo Principal (todas las rutas) -----------" << RESET << endl ;
+    Principal.imprimirAdyacencia(gOrigen) ;
+    cout << endl ;
+    cout << CIAN << "----------- Grafo Kruskal (expansion minima) -----------" << RESET << endl ;
+    k.imprimirAdyacencia(gOrigen) ;
+    cout << endl ;
+
+    // ===================== 4) ESCOGER RUTA Y OBTENER DESTINO =====================
+    Ruta rutaSel ;
+    while (true) {
+        cout << "Escriba el numero de la ruta a tomar (0 para cancelar): " ;
+        int o = leerOpcion() ;
+        if (o == 0) {
+            cout << AMARILLO << "Registro de viaje cancelado." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            return ;
+        }
+        if (o < 0) continue ;
+        string id = "ruta-" + to_string(o) ;
+
+        // La ruta debe existir Y tocar la galaxia origen (estar entre las mostradas).
+        bool valida = false ;
+        for (const Ruta &r : rutasDisponibles) {
+            if (r.id == id) { rutaSel = r ; valida = true ; break ; }
+        }
+        if (!valida) {
+            cout << ROJO << "Esa ruta no existe o no parte de la galaxia origen. Intente de nuevo." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        ruta_id = rutaSel.id ;
+        break ;
+    }
+
+    // El destino es el otro extremo de la ruta (grafo no dirigido).
+    string destino_id = (rutaSel.origen_id == origen_id) ? rutaSel.destino_id : rutaSel.origen_id ;
+    destino_nombre = Principal.getGalaxia(destino_id).nombre ;
+
+    // ===================== 5) FECHA =====================
+    while (true) {
+        cout << "Escriba la fecha del viaje (ej: 2026-06-23): " ;
+        getline(cin, fecha) ;
+        if (fecha.empty()) {
+            cout << ROJO << "La fecha no puede quedar vacia." << RESET << endl ;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue ;
+        }
+        break ;
+    }
+
+    // ===================== 6) COSTO REAL (con costo recomendado) =====================
+    cout << AMARILLO << "Costo recomendado (costo de la ruta): " << rutaSel.costo << RESET << endl ;
+    while (true) {
+        cout << "Escriba el costo real del viaje (>= 0): " ;
+        if (cin >> costo_real && costo_real >= 0) {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+            break ;
+        }
+        cin.clear() ;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n') ;
+        cout << ROJO << "Costo invalido. Ingrese un numero >= 0." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // ===================== 7) EXITOSO? =====================
+    while (true) {
+        cout << "El viaje fue exitoso? (s/n): " ;
+        string resp ;
+        getline(cin, resp) ;
+        if (resp == "s" || resp == "S" || resp == "si" || resp == "Si" || resp == "SI") {
+            exitoso = true ;
+            break ;
+        }
+        if (resp == "n" || resp == "N" || resp == "no" || resp == "No" || resp == "NO") {
+            exitoso = false ;
+            break ;
+        }
+        cout << ROJO << "Responda 's' (si) o 'n' (no)." << RESET << endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    // ===================== 8) GENERAR ID UNICO Y GUARDAR =====================
+    int n = (int)viajes.size() + 1 ;
+    string nuevoId = "viaje-" + to_string(n) ;
+    bool repetido = true ;
+    while (repetido) {
+        repetido = false ;
+        for (const Viaje &v : viajes) {
+            if (v.id == nuevoId) { repetido = true ; break ; }
+        }
+        if (repetido) {
+            n++ ;
+            nuevoId = "viaje-" + to_string(n) ;
+        }
+    }
+
+    Viaje nuevo(nuevoId, nave_id, ruta_id, fecha, costo_real, exitoso,
+                nave_nombre, origen_nombre, destino_nombre) ;
+    viajes.push_back(nuevo) ;
+
+    // Recopiar a cada nave su historial (la nave escogida queda con su nuevo viaje).
+    asignarHistorialANaves(naves, viajes) ;
+
+    cout << endl ;
+    cout << VERDE << "Viaje '" << nuevoId << "' registrado correctamente:" << RESET << endl ;
+    nuevo.print() ;
+    this_thread::sleep_for(chrono::seconds(2));
 }
 
 void smVerNaves () {
