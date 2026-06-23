@@ -16,6 +16,8 @@ void cargardatos() {
     asignarHistorialANaves(naves, viajes) ;   // copia a cada nave sus viajes
     Principal.crearListaAdyacencia() ;
     archivosRUTASMINIMAS= contarArchivosConPrefijo(NOMBRE_ARCHIVO_RUTAS) ;
+    archivosRUTASOPTIMIZADAS = contarArchivosConPrefijo(NOMBRE_ARCHIVO_EXPANSION);
+    
 
 
 }
@@ -24,5 +26,6 @@ int main () {
     SetTraceLogLevel(LOG_WARNING);
     cargardatos() ;
     menu() ;
+    k = kruskal(Principal) ; 
 
 }

@@ -7,6 +7,7 @@
 
 
 #define NOMBRE_ARCHIVO_RUTAS "RutasMinimas_"
+#define NOMBRE_ARCHIVO_EXPANSION "ArbolDeExpansion_"
 #define CARPETA_ARCHIVOS "files"
 
 using namespace std ;
@@ -88,6 +89,40 @@ bool GenerarArchivoRutasMinimas () {
                 << "  |  Tiempo total: " << tiempoTotal << " dias\n\n";
         numero++;
     }
+
+    archivo.close();
+    return true;
+}
+
+
+// Genera un archivo en /files con el contenido de un grafo (pensado para el
+// arbol de expansion que devuelve kruskal). Imprime las galaxias y las rutas en
+// formato tabla, con todos sus datos. El nombre es:
+//   ArbolDeExpansion_<AnyoMesDia>_<cantidad de archivos ArbolDeExpansion_ ya existentes>.txt
+bool generarArchivoRutasExpansion (Grafo &g) {
+    string nombre = string(NOMBRE_ARCHIVO_EXPANSION) + fechaHoy() + "_" + to_string(archivosRUTASOPTIMIZADAS) + ".txt";
+    string ruta = string(CARPETA_ARCHIVOS) + "/" + nombre;
+
+    ofstream archivo(ruta);
+    if (!archivo.is_open()) {
+        return false;
+    }
+
+    streambuf* coutOriginal = cout.rdbuf();
+    cout.rdbuf(archivo.rdbuf());
+
+    cout << "==================================================\n";
+    cout << " ARBOL DE EXPANSION (RUTA GALACTICA OPTIMIZADA)\n";
+    cout << " Fecha: " << fechaHoy() << "\n";
+    cout << " Galaxias: " << g.galaxias.size() << "   |   Rutas: " << g.rutas.size() << "\n";
+    cout << "==================================================\n\n";
+
+    cout << "GALAXIAS:\n";
+    g.printGalaxias();
+
+    cout << "\nRUTAS DEL ARBOL:\n";
+    g.printRutas();
+    cout.rdbuf(coutOriginal);
 
     archivo.close();
     return true;

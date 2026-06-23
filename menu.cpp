@@ -250,8 +250,8 @@ void MenuConsultasRutasdesdeGalaxia () {
     }while (true) ;
 }
 
-void arbolConexiones(Grafo&g ) {    
-    k = kruskal(g) ; 
+void arbolConexiones() {    
+    k = kruskal(Principal) ; 
     GraficarARBOL (k) ;
 } ;
 
@@ -329,7 +329,7 @@ void menuConsultas() {
                 }
 
             case 3: {
-                arbolConexiones (Principal) ;
+                arbolConexiones () ;
                 continue ;
             }
 
@@ -357,7 +357,24 @@ void menuRutasCortas() {
         cout<<VERDE<<"Archivo generado correctamente"<<RESET<<endl ;
         this_thread::sleep_for(chrono::seconds(1));
         archivosRUTASMINIMAS= contarArchivosConPrefijo(NOMBRE_ARCHIVO_RUTAS) ;
+        return;
     } ; 
+    cout<<ROJO<<"Error en la creacion del archivo ;"<<RESET<<endl ;
+    this_thread::sleep_for(chrono::seconds(1));
+}
+
+void menuRutasExpansion() { 
+    k = kruskal(Principal) ; 
+    
+    if(generarArchivoRutasExpansion(k)){ 
+        cout<<VERDE<<"Archivo generado correctamente"<<RESET<<endl ;
+        this_thread::sleep_for(chrono::seconds(1));
+        archivosRUTASOPTIMIZADAS= contarArchivosConPrefijo(NOMBRE_ARCHIVO_RUTAS) ;
+        return ;
+    } ; 
+    cout<<ROJO<<"Error en la creacion del archivo ;"<<RESET<<endl ;
+    this_thread::sleep_for(chrono::seconds(1));
+
 }
 
 
@@ -393,6 +410,8 @@ void menuReportes() {
             }
 
             case 2 : {
+                menuRutasExpansion() ; 
+
 
             }
             case 3 : {
