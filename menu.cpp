@@ -481,12 +481,43 @@ void smEliminarGalaxia() {
 
 void smenuGalaxias () {
     int  o ;
-    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
-    cout  <<ITALICA<<AMARILLO << "======== SubMenu de Galaxias ========"<<RESET<<endl ;
-    cout<<endl ;
-    cout <<"1. Crear Galaxia "<<endl ; 
-    cout <<"2. Editar Galaxia "<<endl ; 
-    cout <<"3. Eliminar Galaxia "<<endl ; 
+
+    do  {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout  <<ITALICA<<AMARILLO << "======== SubMenu de Galaxias ========"<<RESET<<endl ;
+        cout<<endl ;
+        cout <<"1. Crear Galaxia "<<endl ; 
+        cout <<"2. Editar Galaxia "<<endl ; 
+        cout <<"3. Eliminar Galaxia "<<endl ;
+        
+        o= leerOpcion () ;
+
+
+        if (o < 0 || o > 3) {
+            cout << ROJO << "Solo opciones del 0 al 3.\n" << RESET;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue;
+        }
+
+        switch  (o) { 
+
+            case 1 : { 
+                smCrearGalaxia() ;
+
+            }
+            case 2 :{ 
+                smEditarGalaxia() ;
+
+            }
+
+            case 3 : {
+                smEliminarGalaxia() ;
+                
+            }
+
+        }
+
+    }while (o!= 0) ;
     
 } ;
 
@@ -510,13 +541,46 @@ void smEliminarRuta() {
 }
 
 void smenuRutas() {
-    int  o ;
-    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
-    cout  <<ITALICA<<AMARILLO << "========== SubMenu de Rutas ========="<<RESET<<endl ;
-    cout<<endl ;
-    cout <<"1. Crear Ruta "<<endl ; 
-    cout <<"2. Editar Ruta "<<endl ; 
-    cout <<"3. Eliminar Ruta "<<endl ; 
+    int o ;
+
+    do {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout  <<ITALICA<<AMARILLO << "========== SubMenu de Rutas ========="<<RESET<<endl ;
+        cout<<endl ;
+        cout <<"1. Crear Ruta "<<endl ; 
+        cout <<"2. Editar Ruta "<<endl ; 
+        cout <<"3. Eliminar Ruta "<<endl ; 
+
+        o= leerOpcion () ;
+
+        if (o < 0 || o > 3) {
+            cout << ROJO << "Solo opciones del 0 al 3.\n" << RESET;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue;
+        }
+
+        switch  (o) { 
+
+            case 1 : { 
+                smCrearRuta() ;
+                continue;
+
+            }
+            case 2 :{ 
+                smEditarRuta () ;
+                continue;
+
+            }
+
+            case 3 : {
+                smEliminarRuta() ;
+                continue;
+                
+            }
+
+        }
+
+    }while (o!= 0) ;
 } ; 
 
 
@@ -542,13 +606,51 @@ void smregistrarViaje() {
 
 void smenuNaves(){
     int  o ;
-    cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
-    cout  <<ITALICA<<AMARILLO << "======== SubMenu de Naves ========"<<RESET<<endl ;
-    cout<<endl ;
-    cout <<"1. Crear Nave "<<endl ; 
-    cout <<"2. Editar Nave "<<endl ; 
-    cout <<"3. Eliminar Nave "<<endl ; 
-    cout <<"4. Registrar Viaje "<<endl ; 
+
+    do  {
+        cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;cout<<endl ;
+        cout  <<ITALICA<<AMARILLO << "======== SubMenu de Naves ========"<<RESET<<endl ;
+        cout<<endl ;
+        cout <<"1. Crear Nave "<<endl ; 
+        cout <<"2. Editar Nave "<<endl ; 
+        cout <<"3. Eliminar Nave "<<endl ; 
+        cout <<"4. Registrar Viaje "<<endl ; 
+
+        o= leerOpcion () ;
+
+        if (o < 0 || o > 4) {
+            cout << ROJO << "Solo opciones del 0 al 4.\n" << RESET;
+            this_thread::sleep_for(chrono::seconds(1));
+            continue;
+        }
+
+        switch  (o) { 
+
+            case 1 : { 
+                smCrearNaves () ;
+                continue;
+
+            }
+            case 2 :{ 
+                smEditarNaves () ;
+                continue;
+
+            }
+
+            case 3 : {
+                smEditarNaves () ;
+                continue;
+                
+            }
+
+            case 4 : {
+                smregistrarViaje () ; 
+                continue;
+            }
+
+        }
+
+    }while (o!= 0) ;
 } ; 
 
 
