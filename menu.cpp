@@ -1779,7 +1779,7 @@ void smregistrarViaje() {
         this_thread::sleep_for(chrono::seconds(1));
     }
 
-    // ===================== 7) EXITOSO? =====================
+
     while (true) {
         cout << "El viaje fue exitoso? (s/n): " ;
         string resp ;
@@ -1796,7 +1796,6 @@ void smregistrarViaje() {
         this_thread::sleep_for(chrono::seconds(1));
     }
 
-    // ===================== 8) GENERAR ID UNICO Y GUARDAR =====================
     int n = (int)viajes.size() + 1 ;
     string nuevoId = "viaje-" + to_string(n) ;
     bool repetido = true ;
@@ -1839,7 +1838,7 @@ void smVerNaves () {
         if (o == 0) {
             break ;
         }
-        if (o < 0) continue ;   // leerOpcion ya aviso de la entrada invalida
+        if (o < 0) continue ;   // leerOpcion
 
         string id = "nave-" + to_string(o) ;
         Nave* nv = nullptr ;
