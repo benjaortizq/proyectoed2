@@ -2009,6 +2009,15 @@ void menu () {
 
             case 0 : {
 
+                // Antes de salir, guardar TODO el estado (grafo + naves + historial)
+                // en NOMBRE_GRAFO para poder recargarlo despues sin la API.
+                cout << AMARILLO << "Guardando datos en " << NOMBRE_GRAFO << "..." << RESET << endl;
+                if (serializeAll(Principal, naves)) {
+                    cout << VERDE << "Datos guardados en " << NOMBRE_GRAFO << RESET << endl;
+                } else {
+                    cout << ROJO << "No se pudo guardar " << NOMBRE_GRAFO << RESET << endl;
+                }
+
                 cout << MAJENTA<<"Hasta Luego!"<< RESET<<endl ;
                 this_thread::sleep_for(chrono::seconds(1));
                 break ;
